@@ -1,0 +1,332 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" width="1200" height="820">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&amp;display=swap');
+      text { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+    </style>
+
+    <!-- Background gradient -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#060a10"/>
+      <stop offset="100%" stop-color="#0c1220"/>
+    </linearGradient>
+
+    <!-- Green glow gradient -->
+    <radialGradient id="glowGreen" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00e5a0" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#00e5a0" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Layer gradients -->
+    <linearGradient id="uiGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2535"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="pyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2030"/>
+      <stop offset="100%" stop-color="#0f1620"/>
+    </linearGradient>
+    <linearGradient id="javaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c1a30"/>
+      <stop offset="100%" stop-color="#111020"/>
+    </linearGradient>
+    <linearGradient id="storageGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1e2a"/>
+      <stop offset="100%" stop-color="#0f1218"/>
+    </linearGradient>
+    <linearGradient id="sourceGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1e2e"/>
+      <stop offset="100%" stop-color="#12121e"/>
+    </linearGradient>
+
+    <!-- Arrow marker -->
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00e5a0" opacity="0.7"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4d9fff" opacity="0.7"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f5a623" opacity="0.7"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa" opacity="0.7"/>
+    </marker>
+
+    <!-- Drop shadow filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glowFilter">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="820" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid lines -->
+  <g opacity="0.04" stroke="#ffffff" stroke-width="0.5">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="0" y1="600" x2="1200" y2="600"/>
+    <line x1="0" y1="700" x2="1200" y2="700"/>
+    <line x1="100" y1="0" x2="100" y2="820"/>
+    <line x1="300" y1="0" x2="300" y2="820"/>
+    <line x1="500" y1="0" x2="500" y2="820"/>
+    <line x1="700" y1="0" x2="700" y2="820"/>
+    <line x1="900" y1="0" x2="900" y2="820"/>
+    <line x1="1100" y1="0" x2="1100" y2="820"/>
+  </g>
+
+  <!-- Glow at top center -->
+  <ellipse cx="600" cy="0" rx="400" ry="200" fill="url(#glowGreen)" opacity="0.5"/>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- TITLE -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <text x="600" y="38" text-anchor="middle" fill="#00e5a0" font-size="11" letter-spacing="5" opacity="0.9">INFRAWATCH</text>
+  <text x="600" y="60" text-anchor="middle" fill="#dde4f0" font-size="22" font-weight="700" letter-spacing="-0.5">COMPONENT ARCHITECTURE</text>
+  <line x1="400" y1="72" x2="800" y2="72" stroke="#00e5a0" stroke-width="1" opacity="0.3"/>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LAYER 1: REACT UI  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="30" y="90" width="340" height="280" rx="12" fill="url(#uiGrad)" stroke="#00e5a0" stroke-width="1.5" filter="url(#shadow)" opacity="0.95"/>
+  <rect x="30" y="90" width="340" height="36" rx="12" fill="#00e5a0" opacity="0.1"/>
+  <rect x="30" y="114" width="340" height="12" fill="#00e5a0" opacity="0.1"/>
+  <!-- Layer badge -->
+  <rect x="42" y="98" width="12" height="12" rx="3" fill="#00e5a0"/>
+  <text x="62" y="109" fill="#00e5a0" font-size="11" font-weight="700" letter-spacing="2">REACT UI</text>
+  <text x="280" y="109" fill="#5a6478" font-size="10">:5173</text>
+
+  <!-- Components inside -->
+  <rect x="46" y="136" width="148" height="50" rx="7" fill="#0d1520" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="120" y="157" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">App.jsx</text>
+  <text x="120" y="172" text-anchor="middle" fill="#5a6478" font-size="9">Dashboard Shell</text>
+
+  <rect x="206" y="136" width="148" height="50" rx="7" fill="#0d1520" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="280" y="157" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">api.js</text>
+  <text x="280" y="172" text-anchor="middle" fill="#5a6478" font-size="9">API Client + Fallback</text>
+
+  <rect x="46" y="198" width="148" height="50" rx="7" fill="#0d1520" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="120" y="219" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">ChartToggle.jsx</text>
+  <text x="120" y="234" text-anchor="middle" fill="#5a6478" font-size="9">Chart Type Selector</text>
+
+  <rect x="206" y="198" width="148" height="50" rx="7" fill="#0d1520" stroke="#00e5a0" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="280" y="219" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">useChartOptions.js</text>
+  <text x="280" y="234" text-anchor="middle" fill="#5a6478" font-size="9">ECharts Builders</text>
+
+  <!-- Chart types row -->
+  <rect x="46" y="262" width="308" height="94" rx="7" fill="#0a1018" stroke="#1e2d3d" stroke-width="1"/>
+  <text x="200" y="279" text-anchor="middle" fill="#5a6478" font-size="9" letter-spacing="2">APACHE ECHARTS — CHART TYPES</text>
+  <rect x="58" y="285" width="60" height="26" rx="4" fill="#0d1a28" stroke="#00e5a040" stroke-width="1"/>
+  <text x="88" y="302" text-anchor="middle" fill="#8892a4" font-size="9">Line/Area</text>
+  <rect x="126" y="285" width="60" height="26" rx="4" fill="#0d1a28" stroke="#00e5a040" stroke-width="1"/>
+  <text x="156" y="302" text-anchor="middle" fill="#8892a4" font-size="9">Bar/Scatter</text>
+  <rect x="194" y="285" width="60" height="26" rx="4" fill="#0d1a28" stroke="#00e5a040" stroke-width="1"/>
+  <text x="224" y="302" text-anchor="middle" fill="#8892a4" font-size="9">Radar/Gauge</text>
+  <rect x="262" y="285" width="80" height="26" rx="4" fill="#0d1a28" stroke="#00e5a040" stroke-width="1"/>
+  <text x="302" y="302" text-anchor="middle" fill="#8892a4" font-size="9">Heatmap/Tree</text>
+  <text x="200" y="342" text-anchor="middle" fill="#3a4455" font-size="9">Vite · React 18 · Auto-refresh 30s · Mock Fallback</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LAYER 2: PYTHON AGGREGATOR  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="430" y="90" width="340" height="280" rx="12" fill="url(#pyGrad)" stroke="#4d9fff" stroke-width="1.5" filter="url(#shadow)" opacity="0.95"/>
+  <rect x="430" y="90" width="340" height="36" rx="12" fill="#4d9fff" opacity="0.1"/>
+  <rect x="430" y="114" width="340" height="12" fill="#4d9fff" opacity="0.1"/>
+  <rect x="442" y="98" width="12" height="12" rx="3" fill="#4d9fff"/>
+  <text x="462" y="109" fill="#4d9fff" font-size="11" font-weight="700" letter-spacing="2">PYTHON AGGREGATOR</text>
+  <text x="676" y="109" fill="#5a6478" font-size="10">:8090</text>
+
+  <rect x="446" y="136" width="148" height="50" rx="7" fill="#0a1020" stroke="#4d9fff" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="520" y="157" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">main.py</text>
+  <text x="520" y="172" text-anchor="middle" fill="#5a6478" font-size="9">FastAPI App + Poller</text>
+
+  <rect x="606" y="136" width="148" height="50" rx="7" fill="#0a1020" stroke="#4d9fff" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="680" y="157" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">dependencies.py</text>
+  <text x="680" y="172" text-anchor="middle" fill="#5a6478" font-size="9">Shared Store Singleton</text>
+
+  <rect x="446" y="198" width="148" height="50" rx="7" fill="#0a1020" stroke="#4d9fff" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="520" y="219" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">aggregations.py</text>
+  <text x="520" y="234" text-anchor="middle" fill="#5a6478" font-size="9">Stats · SLA · Anomaly</text>
+
+  <rect x="606" y="198" width="148" height="50" rx="7" fill="#0a1020" stroke="#4d9fff" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="680" y="219" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">store.py</text>
+  <text x="680" y="234" text-anchor="middle" fill="#5a6478" font-size="9">In-Memory DataStore</text>
+
+  <!-- Routers row -->
+  <rect x="446" y="262" width="308" height="94" rx="7" fill="#080e18" stroke="#1e2a3d" stroke-width="1"/>
+  <text x="600" y="279" text-anchor="middle" fill="#5a6478" font-size="9" letter-spacing="2">FASTAPI ROUTERS</text>
+  <rect x="458" y="285" width="52" height="26" rx="4" fill="#0a1222" stroke="#4d9fff40" stroke-width="1"/>
+  <text x="484" y="302" text-anchor="middle" fill="#8892a4" font-size="9">summary</text>
+  <rect x="518" y="285" width="52" height="26" rx="4" fill="#0a1222" stroke="#4d9fff40" stroke-width="1"/>
+  <text x="544" y="302" text-anchor="middle" fill="#8892a4" font-size="9">locations</text>
+  <rect x="578" y="285" width="52" height="26" rx="4" fill="#0a1222" stroke="#4d9fff40" stroke-width="1"/>
+  <text x="604" y="302" text-anchor="middle" fill="#8892a4" font-size="9">trend</text>
+  <rect x="638" y="285" width="52" height="26" rx="4" fill="#0a1222" stroke="#4d9fff40" stroke-width="1"/>
+  <text x="664" y="302" text-anchor="middle" fill="#8892a4" font-size="9">heatmap</text>
+  <rect x="698" y="285" width="44" height="26" rx="4" fill="#0a1222" stroke="#4d9fff40" stroke-width="1"/>
+  <text x="720" y="302" text-anchor="middle" fill="#8892a4" font-size="9">ingest</text>
+  <text x="600" y="342" text-anchor="middle" fill="#3a4455" font-size="9">FastAPI · httpx · pydantic 2.12 · uvicorn · Moving Avg · Z-Score</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LAYER 3: QUARKUS BACKEND  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="830" y="90" width="340" height="280" rx="12" fill="url(#javaGrad)" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow)" opacity="0.95"/>
+  <rect x="830" y="90" width="340" height="36" rx="12" fill="#a78bfa" opacity="0.1"/>
+  <rect x="830" y="114" width="340" height="12" fill="#a78bfa" opacity="0.1"/>
+  <rect x="842" y="98" width="12" height="12" rx="3" fill="#a78bfa"/>
+  <text x="862" y="109" fill="#a78bfa" font-size="11" font-weight="700" letter-spacing="2">QUARKUS BACKEND</text>
+  <text x="1076" y="109" fill="#5a6478" font-size="10">:8080</text>
+
+  <rect x="846" y="136" width="148" height="50" rx="7" fill="#100e20" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="920" y="157" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">InfraResource.java</text>
+  <text x="920" y="172" text-anchor="middle" fill="#5a6478" font-size="9">REST Endpoints</text>
+
+  <rect x="1006" y="136" width="148" height="50" rx="7" fill="#100e20" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="1080" y="157" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">DataCollection</text>
+  <text x="1080" y="172" text-anchor="middle" fill="#5a6478" font-size="9">Service.java · Scheduler</text>
+
+  <rect x="846" y="198" width="148" height="50" rx="7" fill="#100e20" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="920" y="214" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">REST Clients</text>
+  <text x="920" y="229" text-anchor="middle" fill="#5a6478" font-size="9">ServiceNow · Prometheus</text>
+  <text x="920" y="242" text-anchor="middle" fill="#5a6478" font-size="9">Datadog</text>
+
+  <rect x="1006" y="198" width="148" height="50" rx="7" fill="#100e20" stroke="#a78bfa" stroke-width="1" stroke-opacity="0.4"/>
+  <text x="1080" y="214" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">Storage Strategy</text>
+  <text x="1080" y="229" text-anchor="middle" fill="#5a6478" font-size="9">DB · File · Redis</text>
+  <text x="1080" y="242" text-anchor="middle" fill="#5a6478" font-size="9">StorageManager.java</text>
+
+  <!-- Models row -->
+  <rect x="846" y="262" width="308" height="94" rx="7" fill="#09080e" stroke="#1e1a30" stroke-width="1"/>
+  <text x="1000" y="279" text-anchor="middle" fill="#5a6478" font-size="9" letter-spacing="2">JPA ENTITIES &amp; PANACHE</text>
+  <rect x="858" y="285" width="130" height="26" rx="4" fill="#100e20" stroke="#a78bfa40" stroke-width="1"/>
+  <text x="923" y="302" text-anchor="middle" fill="#8892a4" font-size="9">LocationAvailability.java</text>
+  <rect x="998" y="285" width="130" height="26" rx="4" fill="#100e20" stroke="#a78bfa40" stroke-width="1"/>
+  <text x="1063" y="302" text-anchor="middle" fill="#8892a4" font-size="9">ServiceMetric.java</text>
+  <text x="1000" y="342" text-anchor="middle" fill="#3a4455" font-size="9">Quarkus 3.27.1 LTS · Java 17 · MicroProfile · OpenAPI/Swagger</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LAYER 4: STORAGE BACKENDS  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="630" y="430" width="540" height="140" rx="12" fill="url(#storageGrad)" stroke="#f5a623" stroke-width="1.5" filter="url(#shadow)" opacity="0.95"/>
+  <rect x="630" y="430" width="540" height="36" rx="12" fill="#f5a623" opacity="0.08"/>
+  <rect x="630" y="454" width="540" height="12" fill="#f5a623" opacity="0.08"/>
+  <rect x="642" y="438" width="12" height="12" rx="3" fill="#f5a623"/>
+  <text x="662" y="449" fill="#f5a623" font-size="11" font-weight="700" letter-spacing="2">STORAGE BACKENDS</text>
+  <text x="1050" y="449" fill="#5a6478" font-size="10">infrawatch.storage.mode</text>
+
+  <rect x="646" y="472" width="114" height="80" rx="7" fill="#0f1018" stroke="#f5a62340" stroke-width="1"/>
+  <text x="703" y="493" text-anchor="middle" fill="#f5a623" font-size="11" font-weight="600">H2</text>
+  <text x="703" y="509" text-anchor="middle" fill="#5a6478" font-size="9">In-memory DB</text>
+  <text x="703" y="523" text-anchor="middle" fill="#3a4455" font-size="9">Dev / Demo</text>
+  <text x="703" y="541" text-anchor="middle" fill="#f5a62360" font-size="8">mode=h2</text>
+
+  <rect x="772" y="472" width="114" height="80" rx="7" fill="#0f1018" stroke="#f5a62340" stroke-width="1"/>
+  <text x="829" y="493" text-anchor="middle" fill="#f5a623" font-size="11" font-weight="600">PostgreSQL</text>
+  <text x="829" y="509" text-anchor="middle" fill="#5a6478" font-size="9">Relational DB</text>
+  <text x="829" y="523" text-anchor="middle" fill="#3a4455" font-size="9">Production</text>
+  <text x="829" y="541" text-anchor="middle" fill="#f5a62360" font-size="8">mode=postgres</text>
+
+  <rect x="898" y="472" width="114" height="80" rx="7" fill="#0f1018" stroke="#f5a62340" stroke-width="1"/>
+  <text x="955" y="493" text-anchor="middle" fill="#f5a623" font-size="11" font-weight="600">File System</text>
+  <text x="955" y="509" text-anchor="middle" fill="#5a6478" font-size="9">JSON/CSV/NDJSON</text>
+  <text x="955" y="523" text-anchor="middle" fill="#3a4455" font-size="9">Audit Trails</text>
+  <text x="955" y="541" text-anchor="middle" fill="#f5a62360" font-size="8">mode=file</text>
+
+  <rect x="1024" y="472" width="114" height="80" rx="7" fill="#0f1018" stroke="#f5a62340" stroke-width="1"/>
+  <text x="1081" y="493" text-anchor="middle" fill="#f5a623" font-size="11" font-weight="600">Redis</text>
+  <text x="1081" y="509" text-anchor="middle" fill="#5a6478" font-size="9">Cache Layer</text>
+  <text x="1081" y="523" text-anchor="middle" fill="#3a4455" font-size="9">High-speed Reads</text>
+  <text x="1081" y="541" text-anchor="middle" fill="#f5a62360" font-size="8">mode=redis</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LAYER 5: EXTERNAL SOURCES  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="30" y="430" width="540" height="140" rx="12" fill="url(#sourceGrad)" stroke="#ff4757" stroke-width="1.5" filter="url(#shadow)" opacity="0.95"/>
+  <rect x="30" y="430" width="540" height="36" rx="12" fill="#ff4757" opacity="0.08"/>
+  <rect x="30" y="454" width="540" height="12" fill="#ff4757" opacity="0.08"/>
+  <rect x="42" y="438" width="12" height="12" rx="3" fill="#ff4757"/>
+  <text x="62" y="449" fill="#ff4757" font-size="11" font-weight="700" letter-spacing="2">EXTERNAL DATA SOURCES</text>
+
+  <rect x="46" y="472" width="150" height="80" rx="7" fill="#0f0a10" stroke="#ff475740" stroke-width="1"/>
+  <text x="121" y="493" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="600">ServiceNow</text>
+  <text x="121" y="509" text-anchor="middle" fill="#5a6478" font-size="9">CMDB · Incidents</text>
+  <text x="121" y="523" text-anchor="middle" fill="#3a4455" font-size="9">Table API · Basic Auth</text>
+  <text x="121" y="541" text-anchor="middle" fill="#ff475760" font-size="8">cmdb_ci_server</text>
+
+  <rect x="210" y="472" width="150" height="80" rx="7" fill="#0f0a10" stroke="#ff475740" stroke-width="1"/>
+  <text x="285" y="493" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="600">Prometheus</text>
+  <text x="285" y="509" text-anchor="middle" fill="#5a6478" font-size="9">Metrics · Targets</text>
+  <text x="285" y="523" text-anchor="middle" fill="#3a4455" font-size="9">PromQL · Range Query</text>
+  <text x="285" y="541" text-anchor="middle" fill="#ff475760" font-size="8">avg_over_time(up[1h])</text>
+
+  <rect x="374" y="472" width="150" height="80" rx="7" fill="#0f0a10" stroke="#ff475740" stroke-width="1"/>
+  <text x="449" y="493" text-anchor="middle" fill="#ff4757" font-size="11" font-weight="600">Datadog</text>
+  <text x="449" y="509" text-anchor="middle" fill="#5a6478" font-size="9">Monitors · SLOs</text>
+  <text x="449" y="523" text-anchor="middle" fill="#3a4455" font-size="9">Metrics API · API Key</text>
+  <text x="449" y="541" text-anchor="middle" fill="#ff475760" font-size="8">system.uptime{*}</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ARROWS: UI → Python  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <line x1="370" y1="220" x2="428" y2="220" stroke="#00e5a0" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrow)" opacity="0.7"/>
+  <text x="399" y="214" text-anchor="middle" fill="#00e5a0" font-size="8" opacity="0.8">HTTP</text>
+
+  <!-- ARROWS: Python → Java -->
+  <line x1="770" y1="220" x2="828" y2="220" stroke="#4d9fff" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowBlue)" opacity="0.7"/>
+  <text x="799" y="214" text-anchor="middle" fill="#4d9fff" font-size="8" opacity="0.8">HTTP</text>
+
+  <!-- ARROWS: Java → Storage -->
+  <line x1="1080" y1="370" x2="1080" y2="428" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowAmber)" opacity="0.7"/>
+  <line x1="955" y1="370" x2="955" y2="428" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowAmber)" opacity="0.7"/>
+
+  <!-- ARROWS: Java → Sources -->
+  <line x1="920" y1="370" x2="449" y2="428" stroke="#ff4757" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowPurple)" opacity="0.6"/>
+  <!-- Label on external data arrow -->
+  <text x="700" y="403" text-anchor="middle" fill="#a78bfa" font-size="8" opacity="0.8">polls every 60s</text>
+
+  <!-- ARROWS: UI direct to Java fallback -->
+  <path d="M 200 370 Q 200 410 600 430" stroke="#00e5a0" stroke-width="1" stroke-dasharray="3,4" fill="none" opacity="0.25" marker-end="url(#arrow)"/>
+  <text x="280" y="415" fill="#00e5a0" font-size="8" opacity="0.4">fallback</text>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- LEGEND  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <rect x="30" y="618" width="1140" height="170" rx="10" fill="#080c14" stroke="#1e2535" stroke-width="1" opacity="0.95"/>
+  <text x="600" y="644" text-anchor="middle" fill="#5a6478" font-size="9" letter-spacing="3">LEGEND &amp; KEY NOTES</text>
+
+  <!-- Legend items -->
+  <rect x="60" y="658" width="10" height="10" rx="2" fill="#00e5a0"/>
+  <text x="78" y="668" fill="#8892a4" font-size="9">React UI Layer</text>
+
+  <rect x="200" y="658" width="10" height="10" rx="2" fill="#4d9fff"/>
+  <text x="218" y="668" fill="#8892a4" font-size="9">Python Aggregator</text>
+
+  <rect x="360" y="658" width="10" height="10" rx="2" fill="#a78bfa"/>
+  <text x="378" y="668" fill="#8892a4" font-size="9">Quarkus Backend</text>
+
+  <rect x="510" y="658" width="10" height="10" rx="2" fill="#f5a623"/>
+  <text x="528" y="668" fill="#8892a4" font-size="9">Storage Layer</text>
+
+  <rect x="640" y="658" width="10" height="10" rx="2" fill="#ff4757"/>
+  <text x="658" y="668" fill="#8892a4" font-size="9">External Sources</text>
+
+  <line x1="790" y1="663" x2="820" y2="663" stroke="#8892a4" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="838" y="668" fill="#8892a4" font-size="9">HTTP / REST call</text>
+
+  <!-- Key notes -->
+  <line x1="50" y1="686" x2="1140" y2="686" stroke="#1e2535" stroke-width="0.5"/>
+
+  <text x="60" y="704" fill="#5a6478" font-size="9">▸  UI tries Aggregator first → falls back to Backend → falls back to mock data (always works offline)</text>
+  <text x="60" y="720" fill="#5a6478" font-size="9">▸  Storage mode switchable via config: infrawatch.storage.mode = h2 | postgres | file | redis</text>
+  <text x="60" y="736" fill="#5a6478" font-size="9">▸  All external sources optional (enabled=false by default); mock data used when none are connected</text>
+  <text x="60" y="752" fill="#5a6478" font-size="9">▸  Python ingest endpoint normalises webhooks from ServiceNow · Prometheus AlertManager · Datadog · Generic</text>
+  <text x="60" y="768" fill="#5a6478" font-size="9">▸  Quarkus 3.27.1 LTS · Java 17 · React 18 + Vite · Python 3.12+ · FastAPI · Apache ECharts 5</text>
+</svg>

@@ -1,0 +1,314 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <style>
+      text { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+    </style>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#060a10"/>
+      <stop offset="100%" stop-color="#0a0e18"/>
+    </linearGradient>
+
+    <!-- Node gradients -->
+    <linearGradient id="nodeGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d2018"/>
+      <stop offset="100%" stop-color="#081410"/>
+    </linearGradient>
+    <linearGradient id="nodeBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1830"/>
+      <stop offset="100%" stop-color="#080e20"/>
+    </linearGradient>
+    <linearGradient id="nodePurple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#160d2e"/>
+      <stop offset="100%" stop-color="#0c0818"/>
+    </linearGradient>
+    <linearGradient id="nodeAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e1408"/>
+      <stop offset="100%" stop-color="#120c04"/>
+    </linearGradient>
+    <linearGradient id="nodeRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e0c0e"/>
+      <stop offset="100%" stop-color="#120608"/>
+    </linearGradient>
+    <linearGradient id="nodeMid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#101820"/>
+      <stop offset="100%" stop-color="#080e14"/>
+    </linearGradient>
+
+    <!-- Glow effects -->
+    <filter id="glow1">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow2">
+      <feDropShadow dx="0" dy="3" stdDeviation="8" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+
+    <!-- Arrows -->
+    <marker id="ag" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#00e5a0"/>
+    </marker>
+    <marker id="ab" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4d9fff"/>
+    </marker>
+    <marker id="ap" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+    </marker>
+    <marker id="aa" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#f5a623"/>
+    </marker>
+    <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#ff4757"/>
+    </marker>
+    <marker id="am" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#8892a4"/>
+    </marker>
+
+    <!-- Diamond/decision shape -->
+    <radialGradient id="decisionGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1030"/>
+      <stop offset="100%" stop-color="#0a0818"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="900" fill="url(#bg2)"/>
+
+  <!-- Grid -->
+  <g opacity="0.03" stroke="#ffffff" stroke-width="0.5">
+    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="0" y1="540" x2="1200" y2="540"/><line x1="0" y1="600" x2="1200" y2="600"/>
+    <line x1="0" y1="660" x2="1200" y2="660"/><line x1="0" y1="720" x2="1200" y2="720"/>
+    <line x1="0" y1="780" x2="1200" y2="780"/><line x1="0" y1="840" x2="1200" y2="840"/>
+    <line x1="100" y1="0" x2="100" y2="900"/><line x1="200" y1="0" x2="200" y2="900"/>
+    <line x1="300" y1="0" x2="300" y2="900"/><line x1="400" y1="0" x2="400" y2="900"/>
+    <line x1="500" y1="0" x2="500" y2="900"/><line x1="600" y1="0" x2="600" y2="900"/>
+    <line x1="700" y1="0" x2="700" y2="900"/><line x1="800" y1="0" x2="800" y2="900"/>
+    <line x1="900" y1="0" x2="900" y2="900"/><line x1="1000" y1="0" x2="1000" y2="900"/>
+    <line x1="1100" y1="0" x2="1100" y2="900"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="35" text-anchor="middle" fill="#00e5a0" font-size="11" letter-spacing="5" opacity="0.9">INFRAWATCH</text>
+  <text x="600" y="58" text-anchor="middle" fill="#dde4f0" font-size="22" font-weight="700" letter-spacing="-0.5">DATA FLOW DIAGRAM</text>
+  <line x1="380" y1="70" x2="820" y2="70" stroke="#00e5a0" stroke-width="1" opacity="0.3"/>
+
+  <!-- ══════════════════════════ -->
+  <!-- COLUMN HEADERS -->
+  <!-- ══════════════════════════ -->
+  <text x="155" y="98" text-anchor="middle" fill="#00e5a0" font-size="9" letter-spacing="2" opacity="0.7">BROWSER</text>
+  <text x="390" y="98" text-anchor="middle" fill="#4d9fff" font-size="9" letter-spacing="2" opacity="0.7">PYTHON AGGREGATOR</text>
+  <text x="660" y="98" text-anchor="middle" fill="#a78bfa" font-size="9" letter-spacing="2" opacity="0.7">QUARKUS BACKEND</text>
+  <text x="920" y="98" text-anchor="middle" fill="#f5a623" font-size="9" letter-spacing="2" opacity="0.7">DATA SOURCES</text>
+  <text x="1095" y="98" text-anchor="middle" fill="#f5a623" font-size="9" letter-spacing="2" opacity="0.7">STORAGE</text>
+
+  <!-- Column swim lane lines -->
+  <line x1="270" y1="80" x2="270" y2="870" stroke="#1e2535" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+  <line x1="520" y1="80" x2="520" y2="870" stroke="#1e2535" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+  <line x1="800" y1="80" x2="800" y2="870" stroke="#1e2535" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+  <line x1="1020" y1="80" x2="1020" y2="870" stroke="#1e2535" stroke-width="1" stroke-dasharray="4,4" opacity="0.5"/>
+
+  <!-- ══════════════════════════ -->
+  <!-- NODE: User Opens Dashboard (START) -->
+  <!-- ══════════════════════════ -->
+  <rect x="55" y="115" width="200" height="50" rx="25" fill="url(#nodeGreen)" stroke="#00e5a0" stroke-width="2" filter="url(#shadow2)"/>
+  <text x="155" y="137" text-anchor="middle" fill="#00e5a0" font-size="11" font-weight="700">USER OPENS</text>
+  <text x="155" y="153" text-anchor="middle" fill="#00e5a0" font-size="11" font-weight="700">DASHBOARD</text>
+
+  <!-- Arrow down -->
+  <line x1="155" y1="165" x2="155" y2="200" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- NODE: App.jsx loads -->
+  <rect x="70" y="200" width="170" height="44" rx="8" fill="url(#nodeGreen)" stroke="#00e5a040" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="155" y="219" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">App.jsx mounts</text>
+  <text x="155" y="234" text-anchor="middle" fill="#5a6478" font-size="9">useEffect → loadData()</text>
+
+  <line x1="155" y1="244" x2="155" y2="276" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- DECISION: Try aggregator? -->
+  <polygon points="155,276 225,305 155,334 85,305" fill="url(#decisionGrad)" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="155" y="301" text-anchor="middle" fill="#a78bfa" font-size="9">Try AGG</text>
+  <text x="155" y="315" text-anchor="middle" fill="#a78bfa" font-size="9">layer?</text>
+
+  <!-- YES branch right -->
+  <line x1="225" y1="305" x2="290" y2="305" stroke="#4d9fff" stroke-width="1.5" marker-end="url(#ab)"/>
+  <text x="256" y="298" text-anchor="middle" fill="#4d9fff" font-size="8">YES</text>
+
+  <!-- NO branch down -->
+  <line x1="155" y1="334" x2="155" y2="364" stroke="#8892a4" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#am)"/>
+  <text x="167" y="354" fill="#8892a4" font-size="8">NO / timeout</text>
+
+  <!-- NODE: fetchLocations() agg -->
+  <rect x="290" y="280" width="200" height="50" rx="8" fill="url(#nodeBlue)" stroke="#4d9fff" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="390" y="300" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">GET /api/agg/locations</text>
+  <text x="390" y="315" text-anchor="middle" fill="#5a6478" font-size="9">httpx client → :8090</text>
+
+  <line x1="390" y1="330" x2="390" y2="364" stroke="#4d9fff" stroke-width="1.5" marker-end="url(#ab)"/>
+
+  <!-- NODE: Python aggregations -->
+  <rect x="290" y="364" width="200" height="60" rx="8" fill="url(#nodeBlue)" stroke="#4d9fff40" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="390" y="383" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">aggregations.py</text>
+  <text x="390" y="398" text-anchor="middle" fill="#5a6478" font-size="9">SLA classify · Moving Avg</text>
+  <text x="390" y="413" text-anchor="middle" fill="#5a6478" font-size="9">Z-Score · Region Rollup</text>
+
+  <line x1="390" y1="424" x2="390" y2="454" stroke="#4d9fff" stroke-width="1.5" marker-end="url(#ab)"/>
+
+  <!-- DECISION: Data in store? -->
+  <polygon points="390,454 460,483 390,512 320,483" fill="url(#decisionGrad)" stroke="#4d9fff" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="390" y="479" text-anchor="middle" fill="#4d9fff" font-size="9">Data in</text>
+  <text x="390" y="493" text-anchor="middle" fill="#4d9fff" font-size="9">store?</text>
+
+  <!-- YES: return enriched data -->
+  <line x1="390" y1="512" x2="390" y2="540" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+  <text x="404" y="530" fill="#00e5a0" font-size="8">YES</text>
+
+  <!-- NO: poll backend first -->
+  <line x1="460" y1="483" x2="530" y2="483" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ap)"/>
+  <text x="494" y="476" text-anchor="middle" fill="#a78bfa" font-size="8">NO</text>
+
+  <!-- NODE: Poll backend -->
+  <rect x="530" y="458" width="200" height="50" rx="8" fill="url(#nodePurple)" stroke="#a78bfa" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="630" y="478" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">GET /api/v1/locations</text>
+  <text x="630" y="493" text-anchor="middle" fill="#5a6478" font-size="9">Quarkus :8080</text>
+
+  <line x1="630" y1="508" x2="630" y2="540" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#ap)"/>
+
+  <!-- NODE: DataCollectionService -->
+  <rect x="530" y="540" width="200" height="60" rx="8" fill="url(#nodePurple)" stroke="#a78bfa40" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="630" y="560" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">DataCollectionService</text>
+  <text x="630" y="575" text-anchor="middle" fill="#5a6478" font-size="9">Check enabled sources</text>
+  <text x="630" y="589" text-anchor="middle" fill="#5a6478" font-size="9">Poll every 60s (scheduler)</text>
+
+  <!-- Arrows to sources -->
+  <line x1="730" y1="570" x2="810" y2="540" stroke="#ff4757" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ar)"/>
+  <line x1="730" y1="570" x2="810" y2="600" stroke="#ff4757" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ar)"/>
+  <line x1="730" y1="570" x2="810" y2="660" stroke="#ff4757" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ar)"/>
+
+  <!-- External source nodes -->
+  <rect x="810" y="510" width="170" height="50" rx="8" fill="url(#nodeRed)" stroke="#ff475740" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="895" y="531" text-anchor="middle" fill="#ff4757" font-size="10" font-weight="600">ServiceNow API</text>
+  <text x="895" y="546" text-anchor="middle" fill="#5a6478" font-size="9">CMDB + Incidents</text>
+
+  <rect x="810" y="575" width="170" height="50" rx="8" fill="url(#nodeRed)" stroke="#ff475740" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="895" y="596" text-anchor="middle" fill="#ff4757" font-size="10" font-weight="600">Prometheus API</text>
+  <text x="895" y="611" text-anchor="middle" fill="#5a6478" font-size="9">Metrics + Targets</text>
+
+  <rect x="810" y="640" width="170" height="50" rx="8" fill="url(#nodeRed)" stroke="#ff475740" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="895" y="661" text-anchor="middle" fill="#ff4757" font-size="10" font-weight="600">Datadog API</text>
+  <text x="895" y="676" text-anchor="middle" fill="#5a6478" font-size="9">Monitors + SLOs</text>
+
+  <!-- Sources converge back to normalise -->
+  <line x1="810" y1="535" x2="760" y2="710" stroke="#ff4757" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+  <line x1="810" y1="600" x2="760" y2="710" stroke="#ff4757" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+  <line x1="810" y1="665" x2="760" y2="710" stroke="#ff4757" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+
+  <!-- NODE: Normalise + Save -->
+  <rect x="540" y="700" width="200" height="50" rx="8" fill="url(#nodePurple)" stroke="#a78bfa40" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="630" y="720" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">Normalise &amp; Persist</text>
+  <text x="630" y="735" text-anchor="middle" fill="#5a6478" font-size="9">StorageManager.save()</text>
+
+  <!-- Save to storage -->
+  <line x1="740" y1="725" x2="1030" y2="725" stroke="#f5a623" stroke-width="1.5" marker-end="url(#aa)"/>
+  <text x="885" y="718" text-anchor="middle" fill="#f5a623" font-size="8">persist snapshot</text>
+
+  <!-- Storage node -->
+  <rect x="1030" y="700" width="140" height="50" rx="8" fill="url(#nodeAmber)" stroke="#f5a623" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="1100" y="720" text-anchor="middle" fill="#f5a623" font-size="10" font-weight="600">Storage</text>
+  <text x="1100" y="735" text-anchor="middle" fill="#5a6478" font-size="9">H2/PG/File/Redis</text>
+
+  <!-- Fallback to Quarkus from browser -->
+  <rect x="55" y="364" width="170" height="44" rx="8" fill="url(#nodeMid)" stroke="#8892a430" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="140" y="381" text-anchor="middle" fill="#8892a4" font-size="10" font-weight="600">Try Quarkus</text>
+  <text x="140" y="396" text-anchor="middle" fill="#5a6478" font-size="9">GET /api/v1/locations</text>
+
+  <line x1="140" y1="408" x2="140" y2="438" stroke="#8892a4" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#am)"/>
+
+  <!-- DECISION: Quarkus available? -->
+  <polygon points="140,438 210,460 140,482 70,460" fill="url(#decisionGrad)" stroke="#8892a4" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="140" y="456" text-anchor="middle" fill="#8892a4" font-size="9">Online?</text>
+  <text x="140" y="469" text-anchor="middle" fill="#8892a4" font-size="9">&#8203;</text>
+
+  <!-- YES use quarkus data -->
+  <line x1="210" y1="460" x2="280" y2="460" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#ap)"/>
+  <text x="244" y="453" text-anchor="middle" fill="#a78bfa" font-size="8">YES →</text>
+
+  <!-- NO use mock -->
+  <line x1="140" y1="482" x2="140" y2="512" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#aa)"/>
+  <text x="152" y="500" fill="#f5a623" font-size="8">NO</text>
+
+  <!-- Mock data node -->
+  <rect x="60" y="512" width="160" height="44" rx="8" fill="url(#nodeAmber)" stroke="#f5a62340" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="140" y="531" text-anchor="middle" fill="#f5a623" font-size="10" font-weight="600">Mock Data</text>
+  <text x="140" y="546" text-anchor="middle" fill="#5a6478" font-size="9">Offline fallback</text>
+
+  <!-- Mock → to UI display -->
+  <line x1="140" y1="556" x2="140" y2="580" stroke="#f5a623" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#ag)"/>
+
+  <!-- NODE: Enriched JSON response -->
+  <rect x="290" y="540" width="200" height="50" rx="8" fill="url(#nodeBlue)" stroke="#4d9fff40" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="390" y="560" text-anchor="middle" fill="#4d9fff" font-size="10" font-weight="600">Enriched JSON</text>
+  <text x="390" y="575" text-anchor="middle" fill="#5a6478" font-size="9">+ SLA tier + healthScore</text>
+
+  <!-- Enriched → to UI -->
+  <line x1="290" y1="565" x2="220" y2="565" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- UI receive / render -->
+  <rect x="55" y="580" width="160" height="60" rx="8" fill="url(#nodeGreen)" stroke="#00e5a040" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="135" y="600" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">Update State</text>
+  <text x="135" y="614" text-anchor="middle" fill="#5a6478" font-size="9">setLocations()</text>
+  <text x="135" y="628" text-anchor="middle" fill="#5a6478" font-size="9">setTrend()</text>
+
+  <line x1="135" y1="640" x2="135" y2="670" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- NODE: ECharts render -->
+  <rect x="55" y="670" width="160" height="60" rx="8" fill="url(#nodeGreen)" stroke="#00e5a040" stroke-width="1" filter="url(#shadow2)"/>
+  <text x="135" y="691" text-anchor="middle" fill="#00e5a0" font-size="10" font-weight="600">ECharts Render</text>
+  <text x="135" y="706" text-anchor="middle" fill="#5a6478" font-size="9">Chart type toggle</text>
+  <text x="135" y="720" text-anchor="middle" fill="#5a6478" font-size="9">KPI cards update</text>
+
+  <line x1="135" y1="730" x2="135" y2="760" stroke="#00e5a0" stroke-width="1.5" marker-end="url(#ag)"/>
+
+  <!-- END node -->
+  <rect x="55" y="760" width="160" height="44" rx="22" fill="url(#nodeGreen)" stroke="#00e5a0" stroke-width="2" filter="url(#shadow2)"/>
+  <text x="135" y="780" text-anchor="middle" fill="#00e5a0" font-size="11" font-weight="700">DASHBOARD</text>
+  <text x="135" y="796" text-anchor="middle" fill="#00e5a0" font-size="11" font-weight="700">LIVE ●</text>
+
+  <!-- Auto-refresh loop arrow -->
+  <path d="M 215 782 Q 260 820 260 840 Q 260 860 155 860 Q 55 860 55 840 Q 55 820 55 782" stroke="#00e5a0" stroke-width="1.5" stroke-dasharray="5,3" fill="none" marker-end="url(#ag)" opacity="0.5"/>
+  <text x="180" y="853" fill="#00e5a0" font-size="8" opacity="0.6">auto-refresh 30s</text>
+
+  <!-- INGEST path from external -->
+  <!-- Ingest webhook arrow -->
+  <line x1="980" y1="600" x2="500" y2="500" stroke="#ff4757" stroke-width="1" stroke-dasharray="3,4" opacity="0.5" marker-end="url(#ar)"/>
+  <text x="760" y="555" text-anchor="middle" fill="#ff4757" font-size="8" opacity="0.6">POST /api/agg/ingest webhook</text>
+
+  <!-- ══════════════════════════ -->
+  <!-- LEGEND -->
+  <!-- ══════════════════════════ -->
+  <rect x="30" y="818" width="1140" height="65" rx="8" fill="#060a10" stroke="#1e2535" stroke-width="1"/>
+  <text x="600" y="836" text-anchor="middle" fill="#5a6478" font-size="9" letter-spacing="3">FLOW KEY</text>
+  <line x1="30" y1="843" x2="1170" y2="843" stroke="#1e2535" stroke-width="0.5"/>
+
+  <line x1="50" y1="860" x2="90" y2="860" stroke="#00e5a0" stroke-width="2" marker-end="url(#ag)"/>
+  <text x="100" y="864" fill="#8892a4" font-size="9">UI / Happy path</text>
+
+  <line x1="230" y1="860" x2="270" y2="860" stroke="#4d9fff" stroke-width="2" marker-end="url(#ab)"/>
+  <text x="280" y="864" fill="#8892a4" font-size="9">Aggregator</text>
+
+  <line x1="390" y1="860" x2="430" y2="860" stroke="#a78bfa" stroke-width="2" marker-end="url(#ap)"/>
+  <text x="440" y="864" fill="#8892a4" font-size="9">Quarkus Backend</text>
+
+  <line x1="580" y1="860" x2="620" y2="860" stroke="#f5a623" stroke-width="2" marker-end="url(#aa)"/>
+  <text x="630" y="864" fill="#8892a4" font-size="9">Storage write</text>
+
+  <line x1="750" y1="860" x2="790" y2="860" stroke="#ff4757" stroke-width="2" marker-end="url(#ar)"/>
+  <text x="800" y="864" fill="#8892a4" font-size="9">External API call</text>
+
+  <line x1="960" y1="860" x2="1000" y2="860" stroke="#8892a4" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#am)"/>
+  <text x="1010" y="864" fill="#8892a4" font-size="9">Fallback path</text>
+
+  <polygon points="1110,855 1125,864 1110,873 1095,864" fill="none" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="1135" y="864" fill="#8892a4" font-size="9">Decision</text>
+</svg>

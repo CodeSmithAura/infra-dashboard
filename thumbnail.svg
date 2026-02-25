@@ -1,0 +1,388 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <style>
+      text { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+    </style>
+
+    <linearGradient id="tbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#060c14"/>
+      <stop offset="100%" stop-color="#0a1020"/>
+    </linearGradient>
+
+    <radialGradient id="glowTop" cx="50%" cy="0%" r="60%">
+      <stop offset="0%" stop-color="#00e5a0" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#00e5a0" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowBL" cx="0%" cy="100%" r="50%">
+      <stop offset="0%" stop-color="#4d9fff" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#4d9fff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowBR" cx="100%" cy="100%" r="50%">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+
+    <linearGradient id="cardG1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1a24"/>
+      <stop offset="100%" stop-color="#08111a"/>
+    </linearGradient>
+    <linearGradient id="cardG2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1420"/>
+      <stop offset="100%" stop-color="#08101a"/>
+    </linearGradient>
+    <linearGradient id="cardG3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#100d22"/>
+      <stop offset="100%" stop-color="#0c0918"/>
+    </linearGradient>
+    <linearGradient id="cardG4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#181410"/>
+      <stop offset="100%" stop-color="#100e08"/>
+    </linearGradient>
+
+    <!-- Bar chart gradient -->
+    <linearGradient id="barGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00e5a0"/>
+      <stop offset="100%" stop-color="#00a870"/>
+    </linearGradient>
+    <linearGradient id="barAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#c07010"/>
+    </linearGradient>
+    <linearGradient id="barRed" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff4757"/>
+      <stop offset="100%" stop-color="#c02030"/>
+    </linearGradient>
+
+    <!-- Line chart gradient area -->
+    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00e5a0" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#00e5a0" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <filter id="tshadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glowF">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="smallGlow">
+      <feGaussianBlur stdDeviation="2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- Clip for chart overflow -->
+    <clipPath id="lineClip">
+      <rect x="0" y="0" width="300" height="120"/>
+    </clipPath>
+    <clipPath id="heatClip">
+      <rect x="0" y="0" width="340" height="150"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="500" fill="url(#tbg)"/>
+
+  <!-- Ambient glows -->
+  <rect width="800" height="500" fill="url(#glowTop)" opacity="0.8"/>
+  <rect width="800" height="500" fill="url(#glowBL)"/>
+  <rect width="800" height="500" fill="url(#glowBR)"/>
+
+  <!-- Subtle dot grid -->
+  <g opacity="0.07" fill="#ffffff">
+    <circle cx="40" cy="40" r="1"/><circle cx="80" cy="40" r="1"/><circle cx="120" cy="40" r="1"/>
+    <circle cx="160" cy="40" r="1"/><circle cx="200" cy="40" r="1"/><circle cx="240" cy="40" r="1"/>
+    <circle cx="280" cy="40" r="1"/><circle cx="320" cy="40" r="1"/><circle cx="360" cy="40" r="1"/>
+    <circle cx="400" cy="40" r="1"/><circle cx="440" cy="40" r="1"/><circle cx="480" cy="40" r="1"/>
+    <circle cx="520" cy="40" r="1"/><circle cx="560" cy="40" r="1"/><circle cx="600" cy="40" r="1"/>
+    <circle cx="640" cy="40" r="1"/><circle cx="680" cy="40" r="1"/><circle cx="720" cy="40" r="1"/>
+    <circle cx="760" cy="40" r="1"/>
+    <circle cx="40" cy="80" r="1"/><circle cx="80" cy="80" r="1"/><circle cx="120" cy="80" r="1"/>
+    <circle cx="160" cy="80" r="1"/><circle cx="200" cy="80" r="1"/><circle cx="240" cy="80" r="1"/>
+    <circle cx="280" cy="80" r="1"/><circle cx="320" cy="80" r="1"/><circle cx="360" cy="80" r="1"/>
+    <circle cx="400" cy="80" r="1"/><circle cx="440" cy="80" r="1"/><circle cx="480" cy="80" r="1"/>
+    <circle cx="520" cy="80" r="1"/><circle cx="560" cy="80" r="1"/><circle cx="600" cy="80" r="1"/>
+    <circle cx="640" cy="80" r="1"/><circle cx="680" cy="80" r="1"/><circle cx="720" cy="80" r="1"/>
+    <circle cx="760" cy="80" r="1"/>
+  </g>
+
+  <!-- ══════════════════════════════ -->
+  <!-- HEADER BAR -->
+  <!-- ══════════════════════════════ -->
+  <rect x="0" y="0" width="800" height="60" fill="#060a10" opacity="0.9"/>
+  <line x1="0" y1="60" x2="800" y2="60" stroke="#00e5a0" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Logo hex -->
+  <polygon points="22,30 30,18 46,18 54,30 46,42 30,42" fill="none" stroke="#00e5a0" stroke-width="1.5" opacity="0.9"/>
+  <text x="38" y="35" text-anchor="middle" fill="#00e5a0" font-size="12" font-weight="700">⬡</text>
+
+  <text x="62" y="28" fill="#dde4f0" font-size="14" font-weight="700" letter-spacing="-0.5">INFRA<tspan fill="#00e5a0">WATCH</tspan></text>
+  <text x="62" y="46" fill="#5a6478" font-size="9" letter-spacing="2">CTO OPERATIONS DASHBOARD</text>
+
+  <!-- Live badge -->
+  <rect x="610" y="18" width="92" height="24" rx="12" fill="rgba(0,229,160,0.1)" stroke="rgba(0,229,160,0.3)" stroke-width="1"/>
+  <circle cx="625" cy="30" r="4" fill="#00e5a0" filter="url(#smallGlow)"/>
+  <text x="665" y="35" text-anchor="middle" fill="#00e5a0" font-size="9" font-weight="600">LIVE · 30s</text>
+
+  <!-- Source badge -->
+  <text x="720" y="35" fill="#5a6478" font-size="9">Source: <tspan fill="#00e5a0">BACKEND</tspan></text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- KPI CARDS ROW -->
+  <!-- ══════════════════════════════ -->
+  <!-- KPI 1: Global Availability -->
+  <rect x="20" y="76" width="175" height="80" rx="10" fill="url(#cardG1)" stroke="rgba(0,229,160,0.2)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="36" y="98" fill="#5a6478" font-size="8" letter-spacing="2">GLOBAL AVAIL.</text>
+  <text x="36" y="134" fill="#00e5a0" font-size="30" font-weight="700">98.4%</text>
+  <text x="36" y="150" fill="#5a6478" font-size="8">Across all locations</text>
+  <circle cx="178" cy="82" r="5" fill="#00e5a0" opacity="0.5" filter="url(#smallGlow)"/>
+
+  <!-- KPI 2: Locations Online -->
+  <rect x="205" y="76" width="175" height="80" rx="10" fill="url(#cardG2)" stroke="rgba(77,159,255,0.2)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="221" y="98" fill="#5a6478" font-size="8" letter-spacing="2">LOCATIONS ONLINE</text>
+  <text x="221" y="134" fill="#dde4f0" font-size="30" font-weight="700">6 <tspan font-size="18" fill="#5a6478">/8</tspan></text>
+  <text x="221" y="150" fill="#5a6478" font-size="8">1 degraded · 1 critical</text>
+
+  <!-- KPI 3: Active Incidents -->
+  <rect x="390" y="76" width="175" height="80" rx="10" fill="url(#cardG4)" stroke="rgba(245,166,35,0.2)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="406" y="98" fill="#5a6478" font-size="8" letter-spacing="2">ACTIVE INCIDENTS</text>
+  <text x="406" y="134" fill="#f5a623" font-size="30" font-weight="700">7</text>
+  <text x="406" y="150" fill="#5a6478" font-size="8">Across all regions</text>
+
+  <!-- KPI 4: 30-Day Uptime -->
+  <rect x="575" y="76" width="205" height="80" rx="10" fill="url(#cardG1)" stroke="rgba(0,229,160,0.2)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="591" y="98" fill="#5a6478" font-size="8" letter-spacing="2">30-DAY UPTIME</text>
+  <text x="591" y="134" fill="#00e5a0" font-size="30" font-weight="700">99.12%</text>
+  <text x="591" y="150" fill="#5a6478" font-size="8">Rolling 30-day window</text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- MAIN CHART AREA (left): TREND LINE -->
+  <!-- ══════════════════════════════ -->
+  <rect x="20" y="170" width="310" height="145" rx="10" fill="url(#cardG1)" stroke="rgba(0,229,160,0.15)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="36" y="192" fill="#5a6478" font-size="8" letter-spacing="2">24-HOUR AVAILABILITY TREND</text>
+
+  <!-- Chart toggle buttons -->
+  <rect x="225" y="181" width="94" height="18" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="225" y="181" width="24" height="18" rx="4" fill="rgba(0,229,160,0.15)"/>
+  <text x="237" y="194" text-anchor="middle" fill="#00e5a0" font-size="9">〜</text>
+  <text x="258" y="194" text-anchor="middle" fill="#5a6478" font-size="9">◭</text>
+  <text x="278" y="194" text-anchor="middle" fill="#5a6478" font-size="9">▮</text>
+  <text x="308" y="194" text-anchor="middle" fill="#5a6478" font-size="9">⬤</text>
+
+  <!-- Grid lines for chart -->
+  <line x1="36" y1="283" x2="314" y2="283" stroke="#1e2535" stroke-width="0.5"/>
+  <line x1="36" y1="257" x2="314" y2="257" stroke="#1e2535" stroke-width="0.5"/>
+  <line x1="36" y1="231" x2="314" y2="231" stroke="#1e2535" stroke-width="0.5"/>
+  <text x="26" y="286" text-anchor="middle" fill="#3a4455" font-size="7">96</text>
+  <text x="26" y="260" text-anchor="middle" fill="#3a4455" font-size="7">98</text>
+  <text x="26" y="234" text-anchor="middle" fill="#3a4455" font-size="7">100</text>
+
+  <!-- Area fill -->
+  <polygon points="36,262 60,255 84,258 108,249 132,251 156,260 180,244 204,248 228,256 252,241 276,254 300,247 314,252 314,285 36,285"
+    fill="url(#areaGrad)"/>
+
+  <!-- Line chart -->
+  <polyline points="36,262 60,255 84,258 108,249 132,251 156,260 180,244 204,248 228,256 252,241 276,254 300,247 314,252"
+    fill="none" stroke="#00e5a0" stroke-width="2" stroke-linejoin="round" filter="url(#smallGlow)"/>
+
+  <!-- Moving avg dashed line -->
+  <polyline points="36,261 60,258 84,256 108,253 132,253 156,254 180,252 204,251 228,252 252,249 276,251 300,250 314,251"
+    fill="none" stroke="#f5a623" stroke-width="1" stroke-dasharray="4,3" opacity="0.7"/>
+
+  <!-- Time labels -->
+  <text x="36" y="298" fill="#3a4455" font-size="7">00:00</text>
+  <text x="118" y="298" fill="#3a4455" font-size="7">06:00</text>
+  <text x="198" y="298" fill="#3a4455" font-size="7">12:00</text>
+  <text x="278" y="298" fill="#3a4455" font-size="7">18:00</text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- LOCATION BAR CHART (middle) -->
+  <!-- ══════════════════════════════ -->
+  <rect x="340" y="170" width="200" height="145" rx="10" fill="url(#cardG2)" stroke="rgba(77,159,255,0.15)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="356" y="192" fill="#5a6478" font-size="8" letter-spacing="2">BY LOCATION</text>
+
+  <!-- toggle for bar -->
+  <rect x="460" y="181" width="70" height="18" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="460" y="181" width="18" height="18" rx="4" fill="rgba(0,229,160,0.15)"/>
+  <text x="469" y="194" text-anchor="middle" fill="#00e5a0" font-size="9">▮</text>
+  <text x="487" y="194" text-anchor="middle" fill="#5a6478" font-size="9">⬡</text>
+  <text x="505" y="194" text-anchor="middle" fill="#5a6478" font-size="9">⊙</text>
+  <text x="522" y="194" text-anchor="middle" fill="#5a6478" font-size="9">⊞</text>
+
+  <!-- Bars -->
+  <rect x="358" y="233" width="18" height="47" rx="3" fill="url(#barGreen)"/>
+  <rect x="382" y="240" width="18" height="40" rx="3" fill="url(#barGreen)"/>
+  <rect x="406" y="252" width="18" height="28" rx="3" fill="url(#barAmber)"/>
+  <rect x="430" y="235" width="18" height="45" rx="3" fill="url(#barGreen)"/>
+  <rect x="454" y="258" width="18" height="22" rx="3" fill="url(#barRed)"/>
+  <rect x="478" y="245" width="18" height="35" rx="3" fill="url(#barAmber)"/>
+  <rect x="502" y="237" width="18" height="43" rx="3" fill="url(#barGreen)"/>
+
+  <!-- 99.9% line -->
+  <line x1="352" y1="238" x2="526" y2="238" stroke="#00e5a0" stroke-width="0.8" stroke-dasharray="3,3" opacity="0.5"/>
+  <text x="528" y="241" fill="#00e5a0" font-size="6" opacity="0.7">99%</text>
+
+  <line x1="352" y1="283" x2="526" y2="283" stroke="#1e2535" stroke-width="0.5"/>
+
+  <!-- X labels -->
+  <text x="367" y="298" text-anchor="middle" fill="#3a4455" font-size="6">NY</text>
+  <text x="391" y="298" text-anchor="middle" fill="#3a4455" font-size="6">SF</text>
+  <text x="415" y="298" text-anchor="middle" fill="#3a4455" font-size="6">FRA</text>
+  <text x="439" y="298" text-anchor="middle" fill="#3a4455" font-size="6">LON</text>
+  <text x="463" y="298" text-anchor="middle" fill="#3a4455" font-size="6">MUM</text>
+  <text x="487" y="298" text-anchor="middle" fill="#3a4455" font-size="6">SIN</text>
+  <text x="511" y="298" text-anchor="middle" fill="#3a4455" font-size="6">TYO</text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- STATUS DONUT (right) -->
+  <!-- ══════════════════════════════ -->
+  <rect x="550" y="170" width="230" height="145" rx="10" fill="url(#cardG3)" stroke="rgba(167,139,250,0.15)" stroke-width="1" filter="url(#tshadow)"/>
+  <text x="566" y="192" fill="#5a6478" font-size="8" letter-spacing="2">STATUS SPLIT</text>
+
+  <!-- Donut chart (SVG arcs) -->
+  <!-- Operational arc ~75% of 2π -->
+  <circle cx="650" cy="242" r="42" fill="none" stroke="#1e2535" stroke-width="14"/>
+  <!-- operational: 75% = 270deg -->
+  <circle cx="650" cy="242" r="42" fill="none" stroke="#00e5a0" stroke-width="14"
+    stroke-dasharray="198 264" stroke-dashoffset="66" filter="url(#smallGlow)"/>
+  <!-- degraded: 12.5% -->
+  <circle cx="650" cy="242" r="42" fill="none" stroke="#f5a623" stroke-width="14"
+    stroke-dasharray="33 264" stroke-dashoffset="-132"/>
+  <!-- critical: 12.5% -->
+  <circle cx="650" cy="242" r="42" fill="none" stroke="#ff4757" stroke-width="14"
+    stroke-dasharray="33 264" stroke-dashoffset="-165"/>
+
+  <!-- Center text -->
+  <text x="650" y="238" text-anchor="middle" fill="#dde4f0" font-size="18" font-weight="700">6</text>
+  <text x="650" y="254" text-anchor="middle" fill="#5a6478" font-size="8">of 8</text>
+
+  <!-- Legend -->
+  <rect x="700" y="213" width="8" height="8" rx="2" fill="#00e5a0"/>
+  <text x="714" y="221" fill="#8892a4" font-size="9">Operational 6</text>
+  <rect x="700" y="230" width="8" height="8" rx="2" fill="#f5a623"/>
+  <text x="714" y="238" fill="#8892a4" font-size="9">Degraded  1</text>
+  <rect x="700" y="247" width="8" height="8" rx="2" fill="#ff4757"/>
+  <text x="714" y="255" fill="#8892a4" font-size="9">Critical  1</text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- LOCATION LIST (left panel) -->
+  <!-- ══════════════════════════════ -->
+  <!-- This replaces the list in actual UI - shown as cards -->
+
+  <!-- ══════════════════════════════ -->
+  <!-- HEATMAP (bottom) -->
+  <!-- ══════════════════════════════ -->
+  <rect x="20" y="328" width="760" height="145" rx="10" fill="url(#cardG2)" stroke="rgba(77,159,255,0.1)" stroke-width="1" filter="url(#tshadow)"/>
+
+  <text x="36" y="350" fill="#5a6478" font-size="8" letter-spacing="2">SERVICE AVAILABILITY HEATMAP — ALL LOCATIONS</text>
+
+  <!-- View toggle -->
+  <rect x="620" y="339" width="148" height="18" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <rect x="620" y="339" width="50" height="18" rx="4" fill="rgba(0,229,160,0.12)"/>
+  <text x="645" y="352" text-anchor="middle" fill="#00e5a0" font-size="9">⊟ Heatmap</text>
+  <text x="710" y="352" text-anchor="middle" fill="#5a6478" font-size="9">∥ Parallel</text>
+
+  <!-- Heatmap grid -->
+  <!-- Service headers -->
+  <g fill="#5a6478" font-size="7">
+    <text x="130" y="372" text-anchor="middle">Compute</text>
+    <text x="218" y="372" text-anchor="middle">Storage</text>
+    <text x="306" y="372" text-anchor="middle">Network</text>
+    <text x="394" y="372" text-anchor="middle">Database</text>
+    <text x="482" y="372" text-anchor="middle">Security</text>
+    <text x="570" y="372" text-anchor="middle">DNS</text>
+    <text x="658" y="372" text-anchor="middle">CDN</text>
+    <text x="746" y="372" text-anchor="middle">Messaging</text>
+  </g>
+
+  <!-- Location labels -->
+  <g fill="#8892a4" font-size="7">
+    <text x="72" y="391" text-anchor="end">US East</text>
+    <text x="72" y="407" text-anchor="end">US West</text>
+    <text x="72" y="423" text-anchor="end">EU Central</text>
+    <text x="72" y="439" text-anchor="end">EU West</text>
+    <text x="72" y="455" text-anchor="end">AP South</text>
+    <text x="72" y="461" text-anchor="end">·· ·</text>
+  </g>
+
+  <!-- Heatmap cells — color-coded by availability -->
+  <!-- Row 1: US East (high availability) -->
+  <g>
+    <rect x="78" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="118" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.8</text>
+    <rect x="166" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="206" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.1</text>
+    <rect x="254" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.75"/><text x="294" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">98.9</text>
+    <rect x="342" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="382" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.4</text>
+    <rect x="430" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.9"/><text x="470" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.7</text>
+    <rect x="518" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="558" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.2</text>
+    <rect x="606" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="646" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.5</text>
+    <rect x="694" y="378" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.7"/><text x="734" y="389" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">98.6</text>
+  </g>
+  <!-- Row 2: US West -->
+  <g>
+    <rect x="78" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="118" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.0</text>
+    <rect x="166" y="394" width="80" height="14" rx="2" fill="#f5a623" opacity="0.8"/><text x="206" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">96.2</text>
+    <rect x="254" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.75"/><text x="294" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">98.4</text>
+    <rect x="342" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="382" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.1</text>
+    <rect x="430" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="470" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.3</text>
+    <rect x="518" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.9"/><text x="558" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.6</text>
+    <rect x="606" y="394" width="80" height="14" rx="2" fill="#f5a623" opacity="0.7"/><text x="646" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">95.8</text>
+    <rect x="694" y="394" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.75"/><text x="734" y="405" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">98.7</text>
+  </g>
+  <!-- Row 3: EU Central -->
+  <g>
+    <rect x="78" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="118" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.4</text>
+    <rect x="166" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="206" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.0</text>
+    <rect x="254" y="410" width="80" height="14" rx="2" fill="#ff4757" opacity="0.75"/><text x="294" y="421" text-anchor="middle" fill="#ffffff" font-size="7" font-weight="600">88.3</text>
+    <rect x="342" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.75"/><text x="382" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">98.2</text>
+    <rect x="430" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="470" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.1</text>
+    <rect x="518" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="558" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.5</text>
+    <rect x="606" y="410" width="80" height="14" rx="2" fill="#f5a623" opacity="0.75"/><text x="646" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">96.1</text>
+    <rect x="694" y="410" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="734" y="421" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.0</text>
+  </g>
+  <!-- Row 4: EU West -->
+  <g>
+    <rect x="78" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.9"/><text x="118" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.7</text>
+    <rect x="166" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="206" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.4</text>
+    <rect x="254" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="294" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.1</text>
+    <rect x="342" y="426" width="80" height="14" rx="2" fill="#f5a623" opacity="0.7"/><text x="382" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">95.6</text>
+    <rect x="430" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.9"/><text x="470" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.8</text>
+    <rect x="518" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="558" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.3</text>
+    <rect x="606" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.8"/><text x="646" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.0</text>
+    <rect x="694" y="426" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.85"/><text x="734" y="437" text-anchor="middle" fill="#060a10" font-size="7" font-weight="600">99.4</text>
+  </g>
+  <!-- Row 5: AP South (fade/truncate) -->
+  <g opacity="0.5">
+    <rect x="78" y="442" width="80" height="14" rx="2" fill="#f5a623" opacity="0.7"/><text x="118" y="453" text-anchor="middle" fill="#060a10" font-size="7">95.2</text>
+    <rect x="166" y="442" width="80" height="14" rx="2" fill="#ff4757" opacity="0.6"/><text x="206" y="453" text-anchor="middle" fill="#ffffff" font-size="7">91.4</text>
+    <rect x="254" y="442" width="80" height="14" rx="2" fill="#f5a623" opacity="0.65"/><text x="294" y="453" text-anchor="middle" fill="#060a10" font-size="7">94.8</text>
+    <rect x="342" y="442" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.7"/><text x="382" y="453" text-anchor="middle" fill="#060a10" font-size="7">97.1</text>
+    <rect x="430" y="442" width="80" height="14" rx="2" fill="#f5a623" opacity="0.6"/><text x="470" y="453" text-anchor="middle" fill="#060a10" font-size="7">95.9</text>
+    <rect x="518" y="442" width="80" height="14" rx="2" fill="#00e5a0" opacity="0.75"/><text x="558" y="453" text-anchor="middle" fill="#060a10" font-size="7">98.3</text>
+    <rect x="606" y="442" width="80" height="14" rx="2" fill="#ff4757" opacity="0.65"/><text x="646" y="453" text-anchor="middle" fill="#ffffff" font-size="7">90.1</text>
+    <rect x="694" y="442" width="80" height="14" rx="2" fill="#f5a623" opacity="0.7"/><text x="734" y="453" text-anchor="middle" fill="#060a10" font-size="7">96.4</text>
+  </g>
+
+  <!-- Fade overlay at bottom of heatmap -->
+  <rect x="20" y="450" width="760" height="23" rx="0" fill="url(#cardG2)" opacity="0.7"/>
+  <rect x="20" y="456" width="760" height="17" rx="0" fill="url(#cardG2)" opacity="0.9"/>
+
+  <!-- Legend bar -->
+  <defs>
+    <linearGradient id="legendGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff4757"/>
+      <stop offset="50%" stop-color="#f5a623"/>
+      <stop offset="100%" stop-color="#00e5a0"/>
+    </linearGradient>
+  </defs>
+  <rect x="600" y="459" width="160" height="6" rx="3" fill="url(#legendGrad)" opacity="0.7"/>
+  <text x="600" y="472" fill="#3a4455" font-size="7">80%</text>
+  <text x="756" y="472" text-anchor="end" fill="#3a4455" font-size="7">100%</text>
+
+  <!-- ══════════════════════════════ -->
+  <!-- FOOTER STRIP -->
+  <!-- ══════════════════════════════ -->
+  <rect x="0" y="480" width="800" height="20" fill="#040810" opacity="0.95"/>
+  <text x="400" y="493" text-anchor="middle" fill="#2a3245" font-size="7" letter-spacing="2">
+    INFRAWATCH · React 18 · Apache ECharts · Quarkus 3.27 · Python FastAPI · ServiceNow · Prometheus · Datadog
+  </text>
+</svg>

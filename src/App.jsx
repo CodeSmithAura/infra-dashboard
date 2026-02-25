@@ -1,60 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ReactECharts from "echarts-for-react";
-
-// ── Mock Data (replace with ServiceNow API calls) ──────────────────────────
-const LOCATIONS = [
-  { id: "us-east", label: "US East", city: "New York", region: "Americas" },
-  { id: "us-west", label: "US West", city: "San Francisco", region: "Americas" },
-  { id: "eu-central", label: "EU Central", city: "Frankfurt", region: "Europe" },
-  { id: "eu-west", label: "EU West", city: "London", region: "Europe" },
-  { id: "ap-south", label: "AP South", city: "Mumbai", region: "Asia Pacific" },
-  { id: "ap-east", label: "AP East", city: "Singapore", region: "Asia Pacific" },
-  { id: "ap-north", label: "AP North", city: "Tokyo", region: "Asia Pacific" },
-  { id: "me-central", label: "ME Central", city: "Dubai", region: "Middle East" },
-];
-
-const SERVICES = ["Compute", "Storage", "Network", "Database", "Security", "DNS", "CDN", "Messaging"];
-
-function randAvail(min = 88, max = 100) {
-  return +(Math.random() * (max - min) + min).toFixed(2);
-}
-function randIncidents(max = 5) {
-  return Math.floor(Math.random() * max);
-}
-
-function generateLocationData() {
-  return LOCATIONS.map((loc) => {
-    const services = SERVICES.map((svc) => {
-      const avail = randAvail(loc.id.includes("me") ? 82 : 90);
-      return {
-        name: svc,
-        availability: avail,
-        status: avail >= 99 ? "operational" : avail >= 95 ? "degraded" : "critical",
-        incidents: randIncidents(avail < 95 ? 4 : 1),
-        responseTime: Math.floor(Math.random() * 280 + 20),
-      };
-    });
-    const overall = +(services.reduce((a, s) => a + s.availability, 0) / services.length).toFixed(2);
-    return {
-      ...loc,
-      overall,
-      status: overall >= 99 ? "operational" : overall >= 95 ? "degraded" : "critical",
-      services,
-      incidents: services.reduce((a, s) => a + s.incidents, 0),
-      uptime30d: +(Math.random() * 2 + 98).toFixed(3),
-    };
-  });
-}
-
-function generateTrendData() {
-  const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
-  return hours.map((h) => ({
-    time: h,
-    availability: +(Math.random() * 4 + 96).toFixed(2),
-    incidents: Math.floor(Math.random() * 3),
-    responseTime: Math.floor(Math.random() * 150 + 50),
-  }));
-}
+import { fetchLocations, fetchTrend, triggerRefresh } from "./api.js";
+import { ChartToggle, CHART_TYPES } from "./components/ChartToggle.jsx";
+import {
+  trendOption as buildTrendOption,
+  locationBarOption,
+  radarOption as buildRadarOption,
+  gaugeOption,
+  treemapOption,
+  heatmapOption as buildHeatmapOption,
+  donutOption as buildDonutOption,
+} from "./components/useChartOptions.js";
 
 const STATUS_COLOR = {
   operational: "#00e5a0",
@@ -123,6 +79,9 @@ function KpiCard({ label, value, sub, status, icon }) {
 }
 
 function LocationCard({ loc, selected, onClick }) {
+  const id       = loc.id || loc.locationId;
+  const overall  = loc.overall ?? loc.overallAvailability ?? 0;
+  const incidents = loc.incidents ?? loc.activeIncidents ?? 0;
   return (
     <div
       onClick={onClick}
@@ -158,32 +117,16 @@ function LocationCard({ loc, selected, onClick }) {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div
-          style={{
-            flex: 1,
-            height: 4,
-            background: "rgba(255,255,255,0.07)",
-            borderRadius: 2,
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              width: `${loc.overall}%`,
-              background: STATUS_COLOR[loc.status],
-              borderRadius: 2,
-              transition: "width 1s ease",
-            }}
-          />
+        <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.07)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${overall}%`, background: STATUS_COLOR[loc.status], borderRadius: 2, transition: "width 1s ease" }} />
         </div>
         <span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace", color: STATUS_COLOR[loc.status], minWidth: 52, textAlign: "right" }}>
-          {loc.overall}%
+          {overall}%
         </span>
       </div>
-      {loc.incidents > 0 && (
+      {incidents > 0 && (
         <div style={{ marginTop: 6, fontSize: 11, color: STATUS_COLOR.degraded }}>
-          ⚠ {loc.incidents} active incident{loc.incidents > 1 ? "s" : ""}
+          ⚠ {incidents} active incident{incidents > 1 ? "s" : ""}
         </div>
       )}
     </div>
@@ -192,244 +135,75 @@ function LocationCard({ loc, selected, onClick }) {
 
 // ── Main Dashboard ─────────────────────────────────────────────────────────
 export default function InfraDashboard() {
-  const [locations, setLocations] = useState(generateLocationData());
-  const [trend, setTrend] = useState(generateTrendData());
-  const [selected, setSelected] = useState(null);
+  const [locations, setLocations] = useState([]);
+  const [trend, setTrend]         = useState([]);
+  const [selected, setSelected]   = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
-  const [tick, setTick] = useState(0);
+  const [dataSource, setDataSource]   = useState("—");
+  const [loading, setLoading]         = useState(true);
+
+  // Chart type toggles — one per chart section
+  const [trendChartType,    setTrendChartType]    = useState("area");
+  const [locationChartType, setLocationChartType] = useState("bar");
+  const [overviewChartType, setOverviewChartType] = useState("heatmap");
+
   const timerRef = useRef(null);
 
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setLocations(generateLocationData());
-      setTrend(generateTrendData());
-      setLastUpdated(new Date());
-      setTick((t) => t + 1);
-    }, 15000);
-    return () => clearInterval(timerRef.current);
+  const loadData = useCallback(async () => {
+    const { locations: locs, source } = await fetchLocations();
+    const tr = await fetchTrend();
+    setLocations(locs);
+    setTrend(tr);
+    setLastUpdated(new Date());
+    setDataSource(source);
+    setLoading(false);
   }, []);
 
-  const selectedLoc = selected ? locations.find((l) => l.id === selected) : null;
+  useEffect(() => {
+    loadData();
+    timerRef.current = setInterval(() => {
+      triggerRefresh().then(loadData);
+    }, 30000);
+    return () => clearInterval(timerRef.current);
+  }, [loadData]);
+
+  const selectedLoc = selected ? locations.find((l) => (l.id || l.locationId) === selected) : null;
 
   // Global metrics
-  const globalAvail = +(locations.reduce((a, l) => a + l.overall, 0) / locations.length).toFixed(2);
-  const totalIncidents = locations.reduce((a, l) => a + l.incidents, 0);
-  const criticalCount = locations.filter((l) => l.status === "critical").length;
-  const degradedCount = locations.filter((l) => l.status === "degraded").length;
+  const globalAvail = locations.length
+    ? +(locations.reduce((a, l) => a + (l.overall ?? l.overallAvailability ?? 0), 0) / locations.length).toFixed(2)
+    : 0;
+  const totalIncidents   = locations.reduce((a, l) => a + (l.incidents ?? l.activeIncidents ?? 0), 0);
+  const criticalCount    = locations.filter((l) => l.status === "critical").length;
+  const degradedCount    = locations.filter((l) => l.status === "degraded").length;
   const operationalCount = locations.filter((l) => l.status === "operational").length;
 
-  // ── Chart options ──────────────────────────────────────────────────────
-  const heatmapOption = {
-    backgroundColor: "transparent",
-    tooltip: {
-      trigger: "item",
-      formatter: (p) => `<b>${p.name}</b><br/>Availability: ${p.value[2]}%`,
-      backgroundColor: "#0d1117",
-      borderColor: "#2a3245",
-      textStyle: { color: "#dde4f0", fontFamily: "'DM Mono', monospace", fontSize: 12 },
-    },
-    grid: { top: 10, bottom: 40, left: 90, right: 20 },
-    xAxis: {
-      type: "category",
-      data: SERVICES,
-      axisLabel: { color: "#5a6478", fontSize: 11, rotate: 30, fontFamily: "'DM Mono', monospace" },
-      axisLine: { lineStyle: { color: "#1e2535" } },
-      splitLine: { show: false },
-    },
-    yAxis: {
-      type: "category",
-      data: LOCATIONS.map((l) => l.label),
-      axisLabel: { color: "#8892a4", fontSize: 11, fontFamily: "'DM Mono', monospace" },
-      axisLine: { lineStyle: { color: "#1e2535" } },
-      splitLine: { show: false },
-    },
-    visualMap: {
-      min: 80,
-      max: 100,
-      show: false,
-      inRange: {
-        color: ["#ff4757", "#f5a623", "#00e5a0"],
-      },
-    },
-    series: [
-      {
-        type: "heatmap",
-        data: locations.flatMap((loc, li) =>
-          loc.services.map((svc, si) => [si, li, svc.availability])
-        ),
-        label: {
-          show: true,
-          fontSize: 10,
-          fontFamily: "'DM Mono', monospace",
-          formatter: (p) => `${p.value[2]}`,
-          color: "#0d1117",
-        },
-        itemStyle: { borderRadius: 4, borderColor: "#0d1117", borderWidth: 2 },
-        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,229,160,0.4)" } },
-      },
-    ],
-  };
+  // ── Chart options (delegate to useChartOptions helpers) ──────────────────
+  const heatmapOption = buildHeatmapOption(locations);
+  const trendChartOption = buildTrendOption(trend, trendChartType);
+  const radarOption = buildRadarOption(selectedLoc);
+  const donutOption = buildDonutOption(operationalCount, degradedCount, criticalCount);
 
-  const trendOption = {
-    backgroundColor: "transparent",
-    tooltip: {
-      trigger: "axis",
-      backgroundColor: "#0d1117",
-      borderColor: "#2a3245",
-      textStyle: { color: "#dde4f0", fontFamily: "'DM Mono', monospace", fontSize: 12 },
-      axisPointer: { lineStyle: { color: "#2a3245" } },
-    },
-    grid: { top: 20, bottom: 30, left: 50, right: 20 },
-    xAxis: {
-      type: "category",
-      data: trend.map((t) => t.time),
-      axisLabel: { color: "#5a6478", fontSize: 10, fontFamily: "'DM Mono', monospace" },
-      axisLine: { lineStyle: { color: "#1e2535" } },
-      splitLine: { show: false },
-    },
-    yAxis: {
-      type: "value",
-      min: 92,
-      max: 100,
-      axisLabel: {
-        color: "#5a6478",
-        fontSize: 10,
-        fontFamily: "'DM Mono', monospace",
-        formatter: "{value}%",
-      },
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: "#1a2030", type: "dashed" } },
-    },
-    series: [
-      {
-        name: "Availability",
-        type: "line",
-        data: trend.map((t) => t.availability),
-        smooth: true,
-        symbol: "none",
-        lineStyle: { color: "#00e5a0", width: 2 },
-        areaStyle: {
-          color: {
-            type: "linear",
-            x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [
-              { offset: 0, color: "rgba(0,229,160,0.25)" },
-              { offset: 1, color: "rgba(0,229,160,0.01)" },
-            ],
-          },
-        },
-      },
-    ],
-  };
+  // Location chart switches between bar / gauge / treemap
+  const locationChartOption = locationChartType === "gauge"
+    ? gaugeOption(locations)
+    : locationChartType === "treemap"
+    ? treemapOption(locations)
+    : locationBarOption(locations, selected);
 
-  const radarOption = selectedLoc
-    ? {
-        backgroundColor: "transparent",
-        tooltip: {
-          backgroundColor: "#0d1117",
-          borderColor: "#2a3245",
-          textStyle: { color: "#dde4f0", fontFamily: "'DM Mono', monospace", fontSize: 12 },
-        },
-        radar: {
-          indicator: SERVICES.map((s) => ({ name: s, max: 100, min: 80 })),
-          shape: "polygon",
-          nameGap: 8,
-          axisName: { color: "#8892a4", fontSize: 11, fontFamily: "'DM Mono', monospace" },
-          splitLine: { lineStyle: { color: "#1e2535" } },
-          splitArea: { show: false },
-          axisLine: { lineStyle: { color: "#1e2535" } },
-        },
-        series: [
-          {
-            type: "radar",
-            data: [
-              {
-                name: selectedLoc.label,
-                value: selectedLoc.services.map((s) => s.availability),
-                lineStyle: { color: "#00e5a0", width: 2 },
-                areaStyle: { color: "rgba(0,229,160,0.12)" },
-                itemStyle: { color: "#00e5a0" },
-              },
-            ],
-          },
-        ],
-      }
-    : null;
+  // Overview chart switches between heatmap / parallel
+  const overviewOption = overviewChartType === "parallel"
+    ? buildParallelOption(locations)
+    : heatmapOption;
 
-  const donutOption = {
-    backgroundColor: "transparent",
-    tooltip: {
-      backgroundColor: "#0d1117",
-      borderColor: "#2a3245",
-      textStyle: { color: "#dde4f0", fontFamily: "'DM Mono', monospace", fontSize: 12 },
-    },
-    series: [
-      {
-        type: "pie",
-        radius: ["55%", "80%"],
-        center: ["50%", "50%"],
-        data: [
-          { value: operationalCount, name: "Operational", itemStyle: { color: "#00e5a0" } },
-          { value: degradedCount, name: "Degraded", itemStyle: { color: "#f5a623" } },
-          { value: criticalCount, name: "Critical", itemStyle: { color: "#ff4757" } },
-        ],
-        label: { show: false },
-        itemStyle: { borderRadius: 4, borderColor: "#0d1117", borderWidth: 3 },
-        emphasis: { scale: false, itemStyle: { shadowBlur: 12 } },
-      },
-    ],
-  };
-
-  const barOption = {
-    backgroundColor: "transparent",
-    tooltip: {
-      trigger: "axis",
-      backgroundColor: "#0d1117",
-      borderColor: "#2a3245",
-      textStyle: { color: "#dde4f0", fontFamily: "'DM Mono', monospace", fontSize: 12 },
-      formatter: (params) => params.map((p) => `${p.name}: ${p.value}%`).join("<br/>"),
-    },
-    grid: { top: 10, bottom: 60, left: 20, right: 20 },
-    xAxis: {
-      type: "category",
-      data: locations.map((l) => l.label),
-      axisLabel: { color: "#5a6478", fontSize: 10, rotate: 30, fontFamily: "'DM Mono', monospace" },
-      axisLine: { lineStyle: { color: "#1e2535" } },
-      splitLine: { show: false },
-    },
-    yAxis: {
-      type: "value",
-      min: 80,
-      max: 100,
-      axisLabel: {
-        color: "#5a6478",
-        fontSize: 10,
-        fontFamily: "'DM Mono', monospace",
-        formatter: "{value}%",
-      },
-      axisLine: { show: false },
-      splitLine: { lineStyle: { color: "#1a2030", type: "dashed" } },
-    },
-    series: [
-      {
-        type: "bar",
-        data: locations.map((l) => ({
-          value: l.overall,
-          itemStyle: {
-            color: STATUS_COLOR[l.status],
-            borderRadius: [4, 4, 0, 0],
-            opacity: selected === l.id ? 1 : selected ? 0.4 : 1,
-          },
-        })),
-        emphasis: { itemStyle: { shadowBlur: 10 } },
-        barMaxWidth: 28,
-      },
-    ],
-    markLine: {
-      data: [{ yAxis: 99.9, lineStyle: { color: "#00e5a0", type: "dashed", width: 1 } }],
-    },
-  };
-
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "#080c12", display: "flex", alignItems: "center",
+                    justifyContent: "center", fontFamily: "'DM Mono', monospace", color: "#5a6478", fontSize: 13 }}>
+        ⬡ Loading InfraWatch...
+      </div>
+    );
+  }
   // ── Layout ─────────────────────────────────────────────────────────────
   return (
     <>
@@ -499,7 +273,7 @@ export default function InfraDashboard() {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
             <div style={{ fontSize: 11, color: "#5a6478" }}>
               Last sync:{" "}
               <span style={{ color: "#8892a4" }}>
@@ -529,10 +303,10 @@ export default function InfraDashboard() {
                   animation: "pulse 2s infinite",
                 }}
               />
-              LIVE · Auto-refresh 15s
+              LIVE · Auto-refresh 30s
             </div>
             <div style={{ fontSize: 11, color: "#5a6478" }}>
-              Source: <span style={{ color: "#8892a4" }}>ServiceNow + Monitoring API</span>
+              Source: <span style={{ color: dataSource === "mock" ? "#f5a623" : "#00e5a0" }}>{dataSource.toUpperCase()}</span>
             </div>
           </div>
         </header>
@@ -550,7 +324,7 @@ export default function InfraDashboard() {
             <KpiCard
               icon="📍"
               label="Locations Online"
-              value={`${operationalCount} / ${LOCATIONS.length}`}
+              value={`${operationalCount} / ${locations.length}`}
               sub={`${degradedCount} degraded · ${criticalCount} critical`}
             />
             <KpiCard
@@ -563,7 +337,7 @@ export default function InfraDashboard() {
             <KpiCard
               icon="📈"
               label="30-Day Uptime Avg"
-              value={`${(locations.reduce((a, l) => a + l.uptime30d, 0) / locations.length).toFixed(2)}%`}
+              value={`${locations.length ? (locations.reduce((a, l) => a + (l.uptime30d || 0), 0) / locations.length).toFixed(2) : "—"}%`}
               sub="Rolling 30-day window"
             />
           </div>
@@ -577,10 +351,10 @@ export default function InfraDashboard() {
               </div>
               {locations.map((loc) => (
                 <LocationCard
-                  key={loc.id}
+                  key={loc.id || loc.locationId}
                   loc={loc}
-                  selected={selected === loc.id}
-                  onClick={() => setSelected(selected === loc.id ? null : loc.id)}
+                  selected={selected === (loc.id || loc.locationId)}
+                  onClick={() => setSelected(selected === (loc.id || loc.locationId) ? null : (loc.id || loc.locationId))}
                 />
               ))}
             </div>
@@ -598,10 +372,13 @@ export default function InfraDashboard() {
                     padding: "20px 24px",
                   }}
                 >
-                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478", marginBottom: 16 }}>
-                    24-Hour Availability Trend — Global
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478" }}>
+                      24-Hour Availability Trend — Global
+                    </div>
+                    <ChartToggle options={CHART_TYPES.TREND} value={trendChartType} onChange={setTrendChartType} label="Chart" />
                   </div>
-                  <ReactECharts option={trendOption} style={{ height: 160 }} />
+                  <ReactECharts option={trendChartOption} style={{ height: 160 }} />
                 </div>
 
                 {/* Donut */}
@@ -637,22 +414,7 @@ export default function InfraDashboard() {
                 </div>
               </div>
 
-              {/* Row 2: Bar chart */}
-              <div
-                style={{
-                  background: "rgba(255,255,255,0.025)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  borderRadius: 14,
-                  padding: "20px 24px",
-                }}
-              >
-                <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478", marginBottom: 16 }}>
-                  Availability by Location
-                </div>
-                <ReactECharts option={barOption} style={{ height: 160 }} />
-              </div>
-
-              {/* Row 3: Heatmap */}
+              {/* Row 2: Location chart with toggle */}
               <div
                 style={{
                   background: "rgba(255,255,255,0.025)",
@@ -663,18 +425,41 @@ export default function InfraDashboard() {
               >
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                   <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478" }}>
-                    Service Availability Heatmap — All Locations
+                    Availability by Location
                   </div>
-                  <div style={{ display: "flex", gap: 14, fontSize: 11, color: "#5a6478" }}>
-                    {[["#ff4757", "< 95%"], ["#f5a623", "95–99%"], ["#00e5a0", "≥ 99%"]].map(([c, l]) => (
-                      <span key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                        <span style={{ width: 10, height: 10, borderRadius: 2, background: c, display: "inline-block" }} />
-                        {l}
-                      </span>
-                    ))}
+                  <ChartToggle options={CHART_TYPES.LOCATION} value={locationChartType} onChange={setLocationChartType} label="Chart" />
+                </div>
+                <ReactECharts option={locationChartOption} style={{ height: locationChartType === "gauge" ? 220 : 160 }} />
+              </div>
+
+              {/* Row 3: Overview chart with toggle */}
+              <div
+                style={{
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: 14,
+                  padding: "20px 24px",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                  <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478" }}>
+                    Service Availability — All Locations
+                  </div>
+                  <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                    {overviewChartType === "heatmap" && (
+                      <div style={{ display: "flex", gap: 14, fontSize: 11, color: "#5a6478" }}>
+                        {[["#ff4757", "< 95%"], ["#f5a623", "95–99%"], ["#00e5a0", "≥ 99%"]].map(([c, l]) => (
+                          <span key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                            <span style={{ width: 10, height: 10, borderRadius: 2, background: c, display: "inline-block" }} />
+                            {l}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <ChartToggle options={CHART_TYPES.OVERVIEW} value={overviewChartType} onChange={setOverviewChartType} label="View" />
                   </div>
                 </div>
-                <ReactECharts option={heatmapOption} style={{ height: 260 }} />
+                <ReactECharts option={overviewOption} style={{ height: 260 }} />
               </div>
 
               {/* Row 4: Location Detail (if selected) */}
@@ -694,7 +479,7 @@ export default function InfraDashboard() {
                         {selectedLoc.label} — {selectedLoc.city}
                       </div>
                       <div style={{ fontSize: 11, color: "#5a6478", letterSpacing: 1 }}>
-                        {selectedLoc.region} · {selectedLoc.services.length} services monitored
+                        {selectedLoc.region} · {(selectedLoc.services || []).length} services monitored
                       </div>
                     </div>
                     <button
@@ -720,7 +505,7 @@ export default function InfraDashboard() {
                       <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "#5a6478", marginBottom: 10 }}>
                         Service Availability Radar
                       </div>
-                      <ReactECharts option={radarOption} style={{ height: 240 }} />
+                      <ReactECharts option={radarOption || {}} style={{ height: 240 }} />
                     </div>
 
                     {/* Service Table */}
@@ -729,9 +514,9 @@ export default function InfraDashboard() {
                         Service Breakdown
                       </div>
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                        {selectedLoc.services.map((svc) => (
+                        {(selectedLoc.services || []).map((svc) => (
                           <div
-                            key={svc.name}
+                            key={svc.name || svc.serviceName}
                             style={{
                               display: "flex",
                               alignItems: "center",
@@ -742,7 +527,7 @@ export default function InfraDashboard() {
                             }}
                           >
                             <StatusDot status={svc.status} pulse />
-                            <span style={{ fontSize: 12, color: "#8892a4", minWidth: 90 }}>{svc.name}</span>
+                            <span style={{ fontSize: 12, color: "#8892a4", minWidth: 90 }}>{svc.name || svc.serviceName}</span>
                             <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.06)", borderRadius: 2 }}>
                               <div
                                 style={{
@@ -757,7 +542,7 @@ export default function InfraDashboard() {
                               {svc.availability}%
                             </span>
                             <span style={{ fontSize: 11, color: "#5a6478", minWidth: 55 }}>
-                              {svc.responseTime}ms
+                              {svc.responseTime || svc.responseTimeMs || 0}ms
                             </span>
                             {svc.incidents > 0 && (
                               <span style={{ fontSize: 11, color: STATUS_COLOR.degraded }}>
