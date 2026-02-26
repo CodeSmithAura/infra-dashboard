@@ -193,6 +193,55 @@ export function heatmapOption(locations = []) {
   };
 }
 
+// ── Parallel Coordinates ─────────────────────────────────────────────────────
+
+export function buildParallelOption(locations = []) {
+  const SERVICES = ["Compute","Storage","Network","Database","Security","DNS","CDN","Messaging"];
+
+  const dimensions = SERVICES.map((s, i) => ({
+    dim: i, name: s, min: 80, max: 100,
+    nameTextStyle: { color: C.mid, fontSize: 10, fontFamily: "'DM Mono', monospace" },
+    axisLine:  { lineStyle: { color: C.border } },
+    axisTick:  { lineStyle: { color: C.border } },
+    axisLabel: { color: C.muted, fontSize: 9, fontFamily: "'DM Mono', monospace",
+                 formatter: (v) => v + "%" },
+    splitLine: { show: false },
+  }));
+
+  const data = locations.map((loc) => {
+    const vals = SERVICES.map((svc) => {
+      const match = (loc.services || []).find(
+        (s) => (s.name || s.serviceName) === svc
+      );
+      return match ? match.availability : 95;
+    });
+    return {
+      value: vals,
+      lineStyle: { color: statusColor(loc.status), width: 1.5, opacity: 0.75 },
+    };
+  });
+
+  return {
+    backgroundColor: "transparent",
+    tooltip: { ...baseTooltip, trigger: "item" },
+    parallelAxis: dimensions,
+    parallel: {
+      top: 40, left: 60, right: 20, bottom: 30,
+      parallelAxisDefault: {
+        type: "value", min: 80, max: 100,
+        nameLocation: "end",
+        nameGap: 8,
+      },
+    },
+    series: [{
+      type: "parallel",
+      data,
+      smooth: true,
+      emphasis: { lineStyle: { width: 3, opacity: 1 } },
+    }],
+  };
+}
+
 // ── Donut ─────────────────────────────────────────────────────────────────────
 
 export function donutOption(op, dg, cr) {
