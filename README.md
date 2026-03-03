@@ -102,3 +102,95 @@ infra-dashboard/
     ├── main.py / config.py / store.py / aggregations.py
     └── routers/{summary,locations,trend,heatmap,ingest}.py
 ```
+## File-Based Data Source
+
+When API access to ServiceNow, Prometheus, or Datadog is unavailable
+(air-gapped environments, local development, CI, demos), InfraWatch can
+read availability data from a flat file instead.
+
+### Quick start
+
+1. Copy a sample file from `backend/src/main/resources/data/`:
+```bash
+   cp backend/src/main/resources/data/sample-locations.csv data/locations.csv
+```
+2. Enable the file source in `application.properties`:
+```properties
+   infrawatch.file-source.enabled=true
+   infrawatch.file-source.path=data/locations.csv
+```
+3. Start the backend — it will use the file automatically when APIs are unreachable.
+
+---
+
+### Configuration reference
+
+| Property | Default | Description |
+|---|---|---|
+| `infrawatch.file-source.enabled` | `false` | Enable file-based ingestion |
+| `infrawatch.file-source.path` | `data/locations.csv` | Path to data file (absolute, relative, or `classpath:`) |
+| `infrawatch.file-source.format` | `csv` | `csv` · `tsv` · `json` · `custom` |
+| `infrawatch.file-source.separator` | `,` | Field delimiter for csv/tsv/custom. Use `\t` for tab, `\|` for pipe |
+| `infrawatch.file-source.has-header` | `true` | Skip first row when true |
+| `infrawatch.file-source.encoding` | `UTF-8` | Java Charset name (`ISO-8859-1`, `windows-1252`, etc.) |
+| `infrawatch.file-source.fallback-only` | `true` | `true` = use file only when APIs fail; `false` = always use file |
+| `infrawatch.file-source.label` | *(filename)* | UI badge label for this source |
+
+---
+
+### Supported formats
+
+#### CSV (default)
+Standard comma-separated. First row is header (configurable).
+```properties
+infrawatch.file-source.format=csv
+infrawatch.file-source.separator=,
+```
+
+#### TSV
+Tab-separated. Separator is automatically set to `\t`.
+```properties
+infrawatch.file-source.format=tsv
+```
+
+#### JSON
+Array of objects. No separator needed.
+```properties
+infrawatch.file-source.format=json
+infrawatch.file-source.path=data/locations.json
+```
+
+#### Custom delimiter (e.g. pipe)
+```properties
+infrawatch.file-source.format=custom
+infrawatch.file-source.separator=|
+infrawatch.file-source.path=data/locations.psv
+```
+
+---
+
+### Column order for delimited formats
+```
+locationId, label, city, region, overallAvailability,
+status, activeIncidents, uptime30d, dataSource
+```
+
+- `status` must be one of: `operational`, `degraded`, `critical`
+- `overallAvailability` and `uptime30d` are floats (e.g. `99.82`)
+- Lines starting with `#` and blank lines are ignored
+- Fields may be double-quoted; embedded quotes escaped as `""`
+
+---
+
+### Source priority chain
+```
+File (fallback-only=false)
+  → ServiceNow
+    → Prometheus
+      → Datadog
+        → File (fallback-only=true)  ← activates here when APIs all fail
+          → Built-in mock data
+```
+
+The UI's **Source** badge will show `file:<filename>` when the file
+source is active, or the configured `label` value if set.

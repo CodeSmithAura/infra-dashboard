@@ -1,0 +1,90 @@
+[
+  {
+    "locationId": "us-east-1",
+    "label": "US East",
+    "city": "New York",
+    "region": "Americas",
+    "overallAvailability": 99.82,
+    "status": "operational",
+    "activeIncidents": 0,
+    "uptime30d": 99.91,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "us-west-1",
+    "label": "US West",
+    "city": "San Francisco",
+    "region": "Americas",
+    "overallAvailability": 98.34,
+    "status": "operational",
+    "activeIncidents": 1,
+    "uptime30d": 98.87,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "eu-central-1",
+    "label": "EU Central",
+    "city": "Frankfurt",
+    "region": "Europe",
+    "overallAvailability": 99.10,
+    "status": "operational",
+    "activeIncidents": 0,
+    "uptime30d": 99.44,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "eu-west-1",
+    "label": "EU West",
+    "city": "London",
+    "region": "Europe",
+    "overallAvailability": 96.21,
+    "status": "degraded",
+    "activeIncidents": 2,
+    "uptime30d": 97.05,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "ap-south-1",
+    "label": "AP South",
+    "city": "Mumbai",
+    "region": "Asia Pacific",
+    "overallAvailability": 91.44,
+    "status": "critical",
+    "activeIncidents": 4,
+    "uptime30d": 93.12,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "ap-east-1",
+    "label": "AP East",
+    "city": "Singapore",
+    "region": "Asia Pacific",
+    "overallAvailability": 99.55,
+    "status": "operational",
+    "activeIncidents": 0,
+    "uptime30d": 99.67,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "ap-northeast-1",
+    "label": "AP NE",
+    "city": "Tokyo",
+    "region": "Asia Pacific",
+    "overallAvailability": 98.90,
+    "status": "operational",
+    "activeIncidents": 1,
+    "uptime30d": 99.01,
+    "dataSource": "file"
+  },
+  {
+    "locationId": "sa-east-1",
+    "label": "SA East",
+    "city": "São Paulo",
+    "region": "South America",
+    "overallAvailability": 97.33,
+    "status": "degraded",
+    "activeIncidents": 1,
+    "uptime30d": 97.88,
+    "dataSource": "file"
+  }
+]

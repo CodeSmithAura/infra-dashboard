@@ -1,22 +1,35 @@
 package com.infrawatch.resource;
 
-import com.infrawatch.model.LocationAvailability;
-import com.infrawatch.model.ServiceMetric;
-import com.infrawatch.service.DataCollectionService;
-import com.infrawatch.storage.StorageManager;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.tags.Tag;
-import org.jboss.logging.Logger;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
+import org.jboss.logging.Logger;
+
+import com.infrawatch.model.LocationAvailability;
+import com.infrawatch.model.ServiceMetric;
+import com.infrawatch.service.DataCollectionService;
+import com.infrawatch.storage.StorageManager;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+ import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Map;
 /**
  * InfraWatch REST API.
  * All endpoints under /api/v1/
@@ -31,32 +44,39 @@ public class InfraResource {
 
     @Inject StorageManager        storage;
     @Inject DataCollectionService collector;
+    @Inject ObjectMapper mapper;
+
 
     // ── Availability endpoints ────────────────────────────────────────────────
 
-    @GET
-    @Path("/locations")
-    @Operation(summary = "Get latest availability snapshot for all locations")
-    public Response getLocations() {
-        List<LocationAvailability> data = storage.getLatestSnapshots();
-        if (data.isEmpty()) {
-            // Trigger immediate collection on first hit
-            collector.collectMockData();
-            data = storage.getLatestSnapshots();
-        }
-        return Response.ok(data).build();
+@GET
+@Path("/locations")
+@Operation(summary = "Get latest availability snapshot for all locations")
+public Response getLocations() {
+    List<LocationAvailability> data = storage.getLatestSnapshots();
+    if (data.isEmpty()) {
+        // Trigger immediate collection on first hit
+        collector.collectAndStore();
+        data = storage.getLatestSnapshots();
     }
+    List<Map<String, Object>> result = data.stream()
+        .map(this::enrichLocation)
+        .toList();
+    return Response.ok(result).build();
+}
 
-    @GET
-    @Path("/locations/{locationId}")
-    @Operation(summary = "Get latest snapshot for a single location")
-    public Response getLocation(@PathParam("locationId") String locationId) {
-        return storage.getLatestSnapshots().stream()
-            .filter(la -> la.locationId.equals(locationId))
-            .findFirst()
-            .map(la -> Response.ok(la).build())
-            .orElse(Response.status(Response.Status.NOT_FOUND).build());
-    }
+@GET
+@Path("/locations/{id}")
+@Operation(summary = "Get latest snapshot for a single location")
+public Response getLocation(@PathParam("id") String id) {
+    LocationAvailability la = storage.getLatestSnapshots()
+        .stream()
+        .filter(l -> id.equals(l.locationId))
+        .findFirst()
+        .orElse(null);
+    if (la == null) return Response.status(404).build();
+    return Response.ok(enrichLocation(la)).build();
+}
 
     @GET
     @Path("/locations/{locationId}/history")
@@ -87,7 +107,7 @@ public class InfraResource {
     public Response getSummary() {
         List<LocationAvailability> all = storage.getLatestSnapshots();
         if (all.isEmpty()) {
-            collector.collectMockData();
+            collector.collectAndStore();
             all = storage.getLatestSnapshots();
         }
 
@@ -147,7 +167,7 @@ public class InfraResource {
     @Path("/admin/collect")
     @Operation(summary = "Trigger immediate data collection cycle")
     public Response triggerCollection() {
-        collector.collectAll();
+        collector.collectAndStore();
         return Response.ok(Map.of("message", "Collection triggered", "timestamp", Instant.now().toString())).build();
     }
 
@@ -178,4 +198,39 @@ public class InfraResource {
             "strategyName",  storage.strategyName()
         )).build();
     }
+
+
+
+// Add this helper to InfraResource
+private Map<String, Object> enrichLocation(LocationAvailability la) {
+    Map<String, Object> out = new java.util.LinkedHashMap<>();
+    out.put("locationId",          la.locationId);
+    out.put("id",                  la.locationId);   // UI uses both
+    out.put("label",               la.label);
+    out.put("city",                la.city);
+    out.put("region",              la.region);
+    out.put("overallAvailability", la.overallAvailability);
+    out.put("overall",             la.overallAvailability);  // UI uses both
+    out.put("status",              la.status);
+    out.put("activeIncidents",     la.activeIncidents);
+    out.put("incidents",           la.activeIncidents);      // UI uses both
+    out.put("uptime30d",           la.uptime30d);
+    out.put("dataSource",          la.dataSource);
+    out.put("capturedAt",          la.capturedAt);
+
+    // Parse servicesJson string → List so frontend gets loc.services array
+    try {
+        if (la.servicesJson != null && !la.servicesJson.isBlank()) {
+            List<Map<String,Object>> services = mapper.readValue(
+                la.servicesJson, new TypeReference<>() {}
+            );
+            out.put("services", services);
+        } else {
+            out.put("services", List.of());
+        }
+    } catch (Exception e) {
+        out.put("services", List.of());
+    }
+    return out;
+}
 }

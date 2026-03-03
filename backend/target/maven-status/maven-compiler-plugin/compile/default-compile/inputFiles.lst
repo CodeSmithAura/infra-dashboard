@@ -7,6 +7,8 @@ C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\model\ServiceMetric.java
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\resource\InfraResource.java
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\service\DataCollectionService.java
+C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\source\FileDataReader.java
+C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\source\FileDataSourceConfig.java
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\storage\DatabaseStorage.java
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\storage\FileStorage.java
 C:\CustomProjects\dashboard\infra-dashboard\backend\src\main\java\com\infrawatch\storage\RedisStorage.java
