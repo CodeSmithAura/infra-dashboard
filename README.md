@@ -1,196 +1,258 @@
-# InfraWatch — CTO Infrastructure Availability Dashboard
+# InfraWatch v2.0.0
 
-A production-ready, three-tier infrastructure availability dashboard.
+Three-tier infrastructure operations dashboard with a Kappa architecture data lake.
 
 ```
-React UI (Vite :5173) → Python Aggregator (FastAPI :8090) → Quarkus Backend (Java :8080)
-                                                                       ↓
-                                                         H2 | PostgreSQL | Files | Redis
+React UI (:5173)  ←→  Python Aggregator (:8090)  ←→  Quarkus Backend (:8080)
+                              ↑                              ↓
+                       Redpanda topic              Six platform integrations
+                    infrawatch-snapshots
+                         /        \
+                        ↓          ↓
+               Dashboard cache   Iceberg writer
+                (Python)          (Java → MinIO Parquet)
 ```
 
-## Quick Start
+## Architecture
 
-### 1. React UI (works offline with mock data)
-```bash
-cp .env.example .env && npm install && npm run dev
+### Three-Tier Application
+
+| Tier | Technology | Port | Role |
+|------|-----------|------|------|
+| Frontend | React + Vite | 5173 | Ops dashboard UI |
+| Aggregator | Python FastAPI | 8090 | Live cache + Redpanda consumer |
+| Backend | Quarkus (Java 17) | 8080 | Data collection + Iceberg writer |
+
+### Kappa Data Lake
+
+| Component | Technology | Port | Role |
+|-----------|-----------|------|------|
+| Event broker | Redpanda (Kafka-compatible) | 19092 | Single source of truth |
+| Object store | MinIO (S3-compatible) | 9000 | Iceberg data files (Parquet) |
+| Table catalog | Apache Iceberg REST | 8181 | Schema + metadata registry |
+
+The Java backend is the sole producer. Two independent consumer groups read from topic `infrawatch-snapshots`:
+
+- `infrawatch-dashboard` (Python aggregator) → live React UI feed
+- `infrawatch-iceberg-writer` (Java `IcebergWriterService`) → columnar Parquet in MinIO
+
+---
+
+## Six Platform Integrations
+
+All integrations are best-effort: a failed or unconfigured source is logged and skipped without blocking the collection cycle.
+
+| # | Platform | Coverage | Auth |
+|---|----------|----------|------|
+| 1 | SolarWinds Observability | LAN node availability | Bearer token |
+| 2 | HPE Aruba Central | WAN / SD-WAN uplinks | OAuth2 client credentials |
+| 3 | ManageEngine PAM360 | Privileged access sessions | API key header |
+| 4 | Microsoft Azure | AVD host pools + Resource Health | OAuth2 client credentials |
+| 5 | Palo Alto Panorama | VPN IPSec tunnels (XML API) | API key query param |
+| 6 | Axonius | Vulnerability / asset scoring | HTTP Basic (key + secret) |
+
+---
+
+## Running the Project
+
+### Prerequisites
+
+| Tool | Version | Required for |
+|------|---------|-------------|
+| Java | 17+ | Backend |
+| Maven | 3.9+ | Backend build |
+| Python | 3.11+ | Aggregator |
+| Node.js | 18+ | Frontend |
+| Docker Desktop | 4.x | Infrastructure services only |
+
+---
+
+### Option A — Infrastructure in Docker, code runs natively (recommended for development)
+
+This is the recommended workflow. Docker runs only the stateful infrastructure services. All three application tiers run natively with hot reload.
+
+**Step 1 — Start infrastructure services**
+
+```powershell
+docker compose up -d redpanda redpanda-init minio minio-init iceberg-rest
 ```
 
-### 2. Quarkus Backend
-```bash
-cd backend && ./mvnw quarkus:dev
-# Swagger: http://localhost:8080/q/swagger-ui
+Wait ~20 seconds for Redpanda and MinIO to become healthy.
+
+**Step 2 — Start the Quarkus backend**
+
+```powershell
+cd backend
+./mvnw quarkus:dev
 ```
 
-### 3. Python Aggregator
-```bash
-cd aggregator && pip install -r requirements.txt
-python -m uvicorn main:app --reload --port 8090
-# Docs: http://localhost:8090/docs
+Backend starts on http://localhost:8080 with live reload.
+
+**Step 3 — Start the Python aggregator**
+
+```powershell
+cd aggregator
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8090
 ```
 
-## Storage Backends
+Aggregator starts on http://localhost:8090.
 
-Set `infrawatch.storage.mode` in `backend/src/main/resources/application.properties`:
+**Step 4 — Start the React frontend**
 
-| Mode | Description | Best For |
-|------|-------------|----------|
-| `h2` | In-memory DB (default) | Dev/Demo |
-| `postgres` | PostgreSQL | Production |
-| `file` | JSON/CSV/NDJSON files | Audit trails |
-| `redis` | Redis cache | High-speed reads |
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-File formats: `infrawatch.storage.file.format=json|csv|ndjson`
+Frontend starts on http://localhost:5173.
 
-## Data Sources
+**Step 5 — Seed mock data**
 
-### ServiceNow
+```powershell
+curl -X POST http://localhost:8090/api/trigger/mock
+```
+
+Then open http://localhost:5173.
+
+---
+
+### Option B — Full Docker stack
+
+Runs everything in containers. Slower to iterate on code changes.
+
+```powershell
+cp .env.example .env
+docker compose up -d
+```
+
+Startup order is enforced by healthchecks:
+`redpanda → minio → minio-init → iceberg-rest → backend → aggregator → ui`
+
+---
+
+### Option C — No Docker at all
+
+Replace each infrastructure service with a native install:
+
+| Service | Native alternative |
+|---------|-------------------|
+| Redpanda | Install [rpk](https://docs.redpanda.com/current/get-started/rpk/) then run `rpk container start` |
+| MinIO | Download the [MinIO Windows binary](https://min.io/download) — runs as a single `.exe` |
+| Iceberg REST | Disable for local dev (see below) |
+
+To disable the Iceberg writer in dev mode so MinIO and the REST catalog are not required, add this to `application.properties`:
+
 ```properties
-infrawatch.servicenow.enabled=true
-infrawatch.servicenow.base-url=https://YOUR_INSTANCE.service-now.com
-infrawatch.servicenow.username=admin
-infrawatch.servicenow.password=secret
+%dev.mp.messaging.incoming.infrawatch-snapshots-iceberg.enabled=false
 ```
 
-### Prometheus
+---
+
+## Platform Integration Configuration
+
+All credentials default to empty string — unconfigured integrations are silently skipped. Set values in `.env` (Docker) or as environment variables (native).
+
 ```properties
-infrawatch.prometheus.enabled=true
-infrawatch.prometheus.base-url=http://your-prometheus:9090
+# SolarWinds
+INFRAWATCH_SOLARWINDS_URL=https://your-solarwinds-host
+INFRAWATCH_SOLARWINDS_API_TOKEN=
+
+# HPE Aruba Central
+INFRAWATCH_ARUBA_URL=https://apigw-prod2.central.arubanetworks.com
+INFRAWATCH_ARUBA_CLIENT_ID=
+INFRAWATCH_ARUBA_CLIENT_SECRET=
+
+# PAM360
+INFRAWATCH_PAM360_URL=https://your-pam360-host:8282
+INFRAWATCH_PAM360_API_KEY=
+
+# Azure
+INFRAWATCH_AZURE_TENANT_ID=
+INFRAWATCH_AZURE_CLIENT_ID=
+INFRAWATCH_AZURE_CLIENT_SECRET=
+INFRAWATCH_AZURE_SUBSCRIPTION_ID=
+
+# Palo Alto Panorama
+INFRAWATCH_PANORAMA_URL=https://your-panorama-host
+INFRAWATCH_PANORAMA_API_KEY=
+
+# Axonius
+INFRAWATCH_AXONIUS_URL=https://your-tenant.axonius.com
+INFRAWATCH_AXONIUS_API_KEY=
+INFRAWATCH_AXONIUS_API_SECRET=
 ```
 
-### Datadog
-```properties
-infrawatch.datadog.enabled=true
-infrawatch.datadog.api-key=YOUR_KEY
-infrawatch.datadog.app-key=YOUR_APP_KEY
+---
+
+## Admin UIs
+
+| UI | URL | Credentials |
+|----|-----|-------------|
+| Redpanda Console | http://localhost:8888 | none |
+| MinIO Console | http://localhost:9001 | infrawatch / infrawatch123 |
+| Iceberg REST API | http://localhost:8181/v1/namespaces | none |
+| Backend health | http://localhost:8080/q/health | none |
+| Aggregator health | http://localhost:8090/health | none |
+| Swagger UI | http://localhost:8080/q/swagger-ui | none |
+
+---
+
+## Data Lake Queries
+
+Once data has been ingested, query Iceberg tables with DuckDB, Spark, or Trino:
+
+```sql
+-- DuckDB
+INSTALL iceberg; LOAD iceberg;
+
+SELECT location_id,
+       avg(overall_availability) AS avg_avail,
+       count(*)                  AS samples
+FROM   iceberg_scan('s3://infrawatch-lake/warehouse/infrawatch/snapshots')
+WHERE  partition_date >= current_date - INTERVAL 7 DAYS
+GROUP  BY location_id
+ORDER  BY avg_avail;
 ```
 
-### Webhook Ingest (any provider)
-```bash
-curl -X POST http://localhost:8090/api/agg/ingest \
-  -H "X-Provider: generic" \
-  -H "Content-Type: application/json" \
-  -d '{"locationId":"us-east","availability":99.1}'
-```
-Supported X-Provider values: `servicenow | prometheus | datadog | generic`
-
-## UI Chart Types
-
-| Panel | Toggle Options |
-|-------|---------------|
-| 24h Trend | Line · Area · Bar · Scatter |
-| By Location | Bar · Radar · Gauge · Treemap |
-| Service Overview | Heatmap · Sankey · Parallel |
+---
 
 ## Project Structure
 
 ```
-infra-dashboard/
-├── src/
-│   ├── App.jsx                   # Dashboard (updated)
-│   ├── api.js                    # NEW: API client + mock fallback
-│   └── components/
-│       ├── ChartToggle.jsx       # NEW: Chart type selector
-│       └── useChartOptions.js    # NEW: All ECharts option builders
-├── backend/                      # NEW: Quarkus Java backend
-│   └── src/main/java/com/infrawatch/
-│       ├── resource/InfraResource.java
-│       ├── service/DataCollectionService.java
-│       ├── client/{ServiceNow,Prometheus,Datadog}Client.java
-│       ├── model/{LocationAvailability,ServiceMetric}.java
-│       └── storage/{Database,File,Redis}Storage.java
-└── aggregator/                   # NEW: Python FastAPI aggregator
-    ├── main.py / config.py / store.py / aggregations.py
-    └── routers/{summary,locations,trend,heatmap,ingest}.py
-```
-## File-Based Data Source
-
-When API access to ServiceNow, Prometheus, or Datadog is unavailable
-(air-gapped environments, local development, CI, demos), InfraWatch can
-read availability data from a flat file instead.
-
-### Quick start
-
-1. Copy a sample file from `backend/src/main/resources/data/`:
-```bash
-   cp backend/src/main/resources/data/sample-locations.csv data/locations.csv
-```
-2. Enable the file source in `application.properties`:
-```properties
-   infrawatch.file-source.enabled=true
-   infrawatch.file-source.path=data/locations.csv
-```
-3. Start the backend — it will use the file automatically when APIs are unreachable.
-
----
-
-### Configuration reference
-
-| Property | Default | Description |
-|---|---|---|
-| `infrawatch.file-source.enabled` | `false` | Enable file-based ingestion |
-| `infrawatch.file-source.path` | `data/locations.csv` | Path to data file (absolute, relative, or `classpath:`) |
-| `infrawatch.file-source.format` | `csv` | `csv` · `tsv` · `json` · `custom` |
-| `infrawatch.file-source.separator` | `,` | Field delimiter for csv/tsv/custom. Use `\t` for tab, `\|` for pipe |
-| `infrawatch.file-source.has-header` | `true` | Skip first row when true |
-| `infrawatch.file-source.encoding` | `UTF-8` | Java Charset name (`ISO-8859-1`, `windows-1252`, etc.) |
-| `infrawatch.file-source.fallback-only` | `true` | `true` = use file only when APIs fail; `false` = always use file |
-| `infrawatch.file-source.label` | *(filename)* | UI badge label for this source |
-
----
-
-### Supported formats
-
-#### CSV (default)
-Standard comma-separated. First row is header (configurable).
-```properties
-infrawatch.file-source.format=csv
-infrawatch.file-source.separator=,
-```
-
-#### TSV
-Tab-separated. Separator is automatically set to `\t`.
-```properties
-infrawatch.file-source.format=tsv
-```
-
-#### JSON
-Array of objects. No separator needed.
-```properties
-infrawatch.file-source.format=json
-infrawatch.file-source.path=data/locations.json
-```
-
-#### Custom delimiter (e.g. pipe)
-```properties
-infrawatch.file-source.format=custom
-infrawatch.file-source.separator=|
-infrawatch.file-source.path=data/locations.psv
+infrawatch/
+├── backend/
+│   ├── src/main/java/com/infrawatch/
+│   │   ├── service/
+│   │   │   ├── DataCollectionService.java    # Six-platform collector + mock
+│   │   │   └── IcebergWriterService.java     # Redpanda → Iceberg analytics sink
+│   │   ├── resource/InfraResource.java       # REST endpoints
+│   │   ├── storage/StorageManager.java       # Storage strategy facade
+│   │   ├── source/FileDataReader.java        # CSV/TSV/JSON file sources
+│   │   ├── model/LocationAvailability.java   # Domain model
+│   │   └── model/ServiceMetric.java          # Domain model
+│   ├── src/main/resources/
+│   │   └── application.properties
+│   └── pom.xml
+├── aggregator/
+│   ├── main.py                               # FastAPI + aiokafka consumer
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/                                 # React/Vite UI
+├── docker-compose.yml
+└── .env.example
 ```
 
 ---
 
-### Column order for delimited formats
-```
-locationId, label, city, region, overallAvailability,
-status, activeIncidents, uptime30d, dataSource
-```
+## Changelog
 
-- `status` must be one of: `operational`, `degraded`, `critical`
-- `overallAvailability` and `uptime30d` are floats (e.g. `99.82`)
-- Lines starting with `#` and blank lines are ignored
-- Fields may be double-quoted; embedded quotes escaped as `""`
+### v2.0.0
 
----
-
-### Source priority chain
-```
-File (fallback-only=false)
-  → ServiceNow
-    → Prometheus
-      → Datadog
-        → File (fallback-only=true)  ← activates here when APIs all fail
-          → Built-in mock data
-```
-
-The UI's **Source** badge will show `file:<filename>` when the file
-source is active, or the configured `label` value if set.
+- Six new platform integrations: SolarWinds, HPE Aruba Central, PAM360, Azure AVD + Resource Health, Palo Alto Panorama, Axonius
+- Kappa data lake: Redpanda + Apache Iceberg + MinIO — dual consumer architecture
+- New `IcebergWriterService.java` — analytics sink writing Parquet to MinIO
+- Refactored `DataCollectionService.java` — factory methods, shared HTTP helpers, no repeated field assignments
+- Updated Python aggregator with async `aiokafka` consumer and HTTP polling fallback
+- Updated `docker-compose.yml`, `pom.xml`, `application.properties`, `requirements.txt`

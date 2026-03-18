@@ -1,0 +1,226 @@
+version: "3.9"
+
+# ═══════════════════════════════════════════════════════════════════════
+#  InfraWatch  —  docker-compose.yml  (v2.0.0)
+#
+#  Tier layout:
+#    redpanda / redpanda-console  — Kafka-compatible event broker
+#    minio / minio-init           — S3-compatible object store
+#    iceberg-rest                 — Apache Iceberg REST catalog
+#    infrawatch-backend           — Quarkus Java (:8080)
+#    infrawatch-aggregator        — Python FastAPI (:8090)
+#    infrawatch-ui                — React/Vite (:5173)
+# ═══════════════════════════════════════════════════════════════════════
+
+networks:
+  infrawatch-net:
+    driver: bridge
+
+volumes:
+  redpanda-data:
+  minio-data:
+
+services:
+
+  # ── Redpanda (Kafka-compatible) ─────────────────────────────────────
+  redpanda:
+    image: redpandadata/redpanda:v23.3.18
+    container_name: infrawatch-redpanda
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --smp 1
+      - --default-log-level=warn
+    ports:
+      - "19092:19092"
+      - "18082:18082"
+      - "18081:18081"
+      - "9644:9644"
+    volumes:
+      - redpanda-data:/var/lib/redpanda/data
+    networks:
+      - infrawatch-net
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -q 'Healthy: true'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  redpanda-init:
+    image: redpandadata/redpanda:v23.3.18
+    container_name: infrawatch-redpanda-init
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "rpk --brokers redpanda:9092 topic create infrawatch-snapshots
+        --partitions 6 --replicas 1
+        --topic-config retention.ms=604800000
+        --topic-config cleanup.policy=delete || true"
+    networks:
+      - infrawatch-net
+
+  redpanda-console:
+    image: redpandadata/console:v2.4.5
+    container_name: infrawatch-redpanda-console
+    depends_on:
+      - redpanda
+    ports:
+      - "8888:8080"
+    environment:
+      KAFKA_BROKERS: "redpanda:9092"
+      KAFKA_SCHEMAREGISTRY_ENABLED: "true"
+      KAFKA_SCHEMAREGISTRY_URLS: "http://redpanda:8081"
+    networks:
+      - infrawatch-net
+
+  # ── MinIO (S3-compatible object store) ──────────────────────────────
+  minio:
+    image: quay.io/minio/minio:RELEASE.2024-04-06T05-26-02Z
+    container_name: infrawatch-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER:     ${MINIO_ROOT_USER:-infrawatch}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-infrawatch123}
+    volumes:
+      - minio-data:/data
+    networks:
+      - infrawatch-net
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: quay.io/minio/mc:RELEASE.2024-04-06T16-31-49Z
+    container_name: infrawatch-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command: >
+      "mc alias set local http://minio:9000 ${MINIO_ROOT_USER:-infrawatch} ${MINIO_ROOT_PASSWORD:-infrawatch123} &&
+       mc mb --ignore-existing local/infrawatch-lake &&
+       mc mb --ignore-existing local/infrawatch-staging &&
+       echo 'MinIO buckets ready'"
+    networks:
+      - infrawatch-net
+
+  # ── Apache Iceberg REST Catalog ─────────────────────────────────────
+  iceberg-rest:
+    image: tabulario/iceberg-rest:0.10.0
+    container_name: infrawatch-iceberg-rest
+    depends_on:
+      minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "8181:8181"
+    environment:
+      AWS_ACCESS_KEY_ID:              ${MINIO_ROOT_USER:-infrawatch}
+      AWS_SECRET_ACCESS_KEY:          ${MINIO_ROOT_PASSWORD:-infrawatch123}
+      AWS_REGION:                     us-east-1
+      CATALOG_WAREHOUSE:              s3://infrawatch-lake/warehouse
+      CATALOG_IO__IMPL:               org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_S3_ENDPOINT:            http://minio:9000
+      CATALOG_S3_PATH__STYLE__ACCESS: "true"
+    networks:
+      - infrawatch-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8181/v1/config || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  # ── InfraWatch Backend (Quarkus :8080) ──────────────────────────────
+  infrawatch-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: infrawatch-backend
+    depends_on:
+      redpanda:
+        condition: service_healthy
+      iceberg-rest:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS:          redpanda:9092
+      ICEBERG_REST_URI:                 http://iceberg-rest:8181
+      ICEBERG_WAREHOUSE:                s3://infrawatch-lake/warehouse
+      MINIO_ENDPOINT:                   http://minio:9000
+      MINIO_ROOT_USER:                  ${MINIO_ROOT_USER:-infrawatch}
+      MINIO_ROOT_PASSWORD:              ${MINIO_ROOT_PASSWORD:-infrawatch123}
+      INFRAWATCH_SOLARWINDS_URL:        ${INFRAWATCH_SOLARWINDS_URL:-}
+      INFRAWATCH_SOLARWINDS_API_TOKEN:  ${INFRAWATCH_SOLARWINDS_API_TOKEN:-}
+      INFRAWATCH_ARUBA_URL:             ${INFRAWATCH_ARUBA_URL:-}
+      INFRAWATCH_ARUBA_CLIENT_ID:       ${INFRAWATCH_ARUBA_CLIENT_ID:-}
+      INFRAWATCH_ARUBA_CLIENT_SECRET:   ${INFRAWATCH_ARUBA_CLIENT_SECRET:-}
+      INFRAWATCH_PAM360_URL:            ${INFRAWATCH_PAM360_URL:-}
+      INFRAWATCH_PAM360_API_KEY:        ${INFRAWATCH_PAM360_API_KEY:-}
+      INFRAWATCH_AZURE_TENANT_ID:       ${INFRAWATCH_AZURE_TENANT_ID:-}
+      INFRAWATCH_AZURE_CLIENT_ID:       ${INFRAWATCH_AZURE_CLIENT_ID:-}
+      INFRAWATCH_AZURE_CLIENT_SECRET:   ${INFRAWATCH_AZURE_CLIENT_SECRET:-}
+      INFRAWATCH_AZURE_SUBSCRIPTION_ID: ${INFRAWATCH_AZURE_SUBSCRIPTION_ID:-}
+      INFRAWATCH_PANORAMA_URL:          ${INFRAWATCH_PANORAMA_URL:-}
+      INFRAWATCH_PANORAMA_API_KEY:      ${INFRAWATCH_PANORAMA_API_KEY:-}
+      INFRAWATCH_AXONIUS_URL:           ${INFRAWATCH_AXONIUS_URL:-}
+      INFRAWATCH_AXONIUS_API_KEY:       ${INFRAWATCH_AXONIUS_API_KEY:-}
+      INFRAWATCH_AXONIUS_API_SECRET:    ${INFRAWATCH_AXONIUS_API_SECRET:-}
+    networks:
+      - infrawatch-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/q/health/live || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+
+  # ── InfraWatch Aggregator (Python FastAPI :8090) ─────────────────────
+  infrawatch-aggregator:
+    build:
+      context: ./aggregator
+      dockerfile: Dockerfile
+    container_name: infrawatch-aggregator
+    depends_on:
+      redpanda:
+        condition: service_healthy
+      infrawatch-backend:
+        condition: service_healthy
+    ports:
+      - "8090:8090"
+    environment:
+      BACKEND_URL:             http://infrawatch-backend:8080
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_TOPIC:             infrawatch-snapshots
+      KAFKA_GROUP_ID:          infrawatch-dashboard
+      POLL_INTERVAL:           "30"
+    networks:
+      - infrawatch-net
+
+  # ── InfraWatch UI (React/Vite :5173) ────────────────────────────────
+  infrawatch-ui:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: infrawatch-ui
+    depends_on:
+      - infrawatch-aggregator
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8090
+    networks:
+      - infrawatch-net

@@ -1,14 +1,15 @@
 com\infrawatch\service\DataCollectionService.class
 com\infrawatch\source\FileDataReader.class
-com\infrawatch\service\DataCollectionService$1.class
 com\infrawatch\client\DatadogClient$Series.class
 com\infrawatch\client\ServiceNowAuthHeaderFactory.class
 com\infrawatch\client\ServiceNowClient.class
+com\infrawatch\resource\InfraResource$1.class
 com\infrawatch\resource\InfraResource.class
 com\infrawatch\storage\RedisStorage.class
 com\infrawatch\client\DatadogClient$SloResponse.class
 com\infrawatch\storage\StorageStrategy.class
 com\infrawatch\model\ServiceMetric$ServiceDto.class
+com\infrawatch\service\DataCollectionService$ThrowingRunnable.class
 com\infrawatch\client\ServiceNowClient$TableResponse.class
 com\infrawatch\client\DatadogAuthHeaderFactory.class
 com\infrawatch\storage\FileStorage.class
@@ -22,6 +23,7 @@ com\infrawatch\storage\StorageManager.class
 com\infrawatch\model\ServiceMetric.class
 com\infrawatch\client\PrometheusClient$QueryData.class
 com\infrawatch\model\LocationAvailability.class
+com\infrawatch\service\IcebergWriterService.class
 com\infrawatch\source\FileDataReader$1.class
 com\infrawatch\client\DatadogClient$MetricsResponse.class
 com\infrawatch\client\PrometheusClient.class

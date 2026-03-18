@@ -1,6 +1,17 @@
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-httpx>=0.27.0
-pydantic>=2.12.0
-pydantic-settings>=2.6.0
-anyio>=4.6.0
+# InfraWatch Python Aggregator — requirements.txt (v2.0.0)
+
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# HTTP client (async)
+httpx==0.27.0
+
+# Redpanda / Kafka consumer
+confluent-kafka==2.4.0
+
+# Data validation
+pydantic==2.7.1
+
+# Utilities
+python-dotenv==1.0.1
